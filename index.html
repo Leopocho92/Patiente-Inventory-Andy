@@ -1,1190 +1,1167 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-title" content="Pacientes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <title>Control de Pacientes</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-title" content="Control Clínico"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <title>Control Clínico · Psicología</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
   <style>
-    :root {
-      --bg: #f4f7fb;
-      --card: #ffffff;
-      --text: #111827;
-      --muted: #6b7280;
-      --line: #e5e7eb;
-      --blue: #2563eb;
-      --purple: #7c3aed;
-      --red: #dc2626;
-      --green: #16a34a;
-      --orange: #f59e0b;
-      --shadow: 0 10px 28px rgba(15, 23, 42, .08);
-      --radius: 22px;
+    :root{
+      --bg:#0d1117; --bg2:#161b22; --bg3:#1c2333; --bg4:#21262d;
+      --surface:#1c2333; --surface2:#21262d; --surface3:#2d333b;
+      --border:#30363d; --border2:#444c56;
+      --ink:#e6edf3; --ink2:#c9d1d9; --muted:#8b949e; --muted2:#6e7681;
+      --blue:#58a6ff; --blue2:#1f6feb; --blue-glow:rgba(88,166,255,.15);
+      --teal:#39d353; --teal2:#2ea043;
+      --purple:#bc8cff; --purple2:#8957e5;
+      --red:#f85149; --red2:#da3633;
+      --orange:#ffa657; --orange2:#d29922;
+      --green:#3fb950; --green2:#238636;
+      --accent:#58a6ff;
+      --shadow:0 8px 32px rgba(0,0,0,.45); --shadow2:0 2px 12px rgba(0,0,0,.3);
+      --radius:16px; --radius2:12px; --radius3:8px;
+      --side:260px;
+      --font-display:'DM Serif Display',Georgia,serif;
+      --font:'Outfit',system-ui,sans-serif;
+      --transition:all .18s cubic-bezier(.4,0,.2,1);
+    }
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
+    html{scroll-behavior:smooth;font-size:15px}
+    body{font-family:var(--font);color:var(--ink);background:var(--bg);overflow-x:hidden;min-height:100vh;-webkit-font-smoothing:antialiased}
+    button,input,select,textarea{font:inherit;color:inherit}
+    button{cursor:pointer}
+    .hidden{display:none!important}
+    a{color:var(--blue);text-decoration:none}
+
+    /* ─── LAYOUT ─────────────────────────────── */
+    .shell{display:grid;grid-template-columns:var(--side) 1fr;min-height:100vh}
+
+    /* ─── SIDEBAR ────────────────────────────── */
+    .sidebar{
+      position:sticky;top:0;height:100vh;
+      background:var(--bg2);
+      border-right:1px solid var(--border);
+      display:flex;flex-direction:column;
+      overflow-y:auto;overflow-x:hidden;
+      z-index:20;
+    }
+    .sidebar-inner{display:flex;flex-direction:column;gap:0;height:100%;padding:0}
+    .brand{
+      display:flex;align-items:center;gap:12px;
+      padding:20px 18px 16px;
+      border-bottom:1px solid var(--border);
+    }
+    .logo{
+      width:38px;height:38px;border-radius:10px;flex-shrink:0;
+      background:linear-gradient(135deg,var(--blue2),var(--purple2));
+      display:grid;place-items:center;
+      font-family:var(--font-display);font-size:18px;color:#fff;
+      box-shadow:0 4px 16px rgba(31,111,235,.4);
+    }
+    .brand-text h1{font-size:15px;font-weight:700;line-height:1.1;color:var(--ink)}
+    .brand-text p{font-size:11px;color:var(--muted);font-weight:500;margin-top:2px}
+
+    .nav-section{padding:16px 10px 8px;border-bottom:1px solid var(--border)}
+    .nav-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted2);padding:0 8px;margin-bottom:6px}
+    .nav-item{
+      display:flex;align-items:center;gap:10px;
+      width:100%;border:0;background:transparent;
+      color:var(--muted);text-align:left;
+      border-radius:var(--radius3);padding:9px 10px;
+      font-size:13px;font-weight:500;
+      transition:var(--transition);position:relative;
+    }
+    .nav-item:hover{background:var(--bg3);color:var(--ink2)}
+    .nav-item.active{background:var(--blue-glow);color:var(--blue);font-weight:600}
+    .nav-item.active::before{content:'';position:absolute;left:0;top:6px;bottom:6px;width:3px;background:var(--blue);border-radius:0 3px 3px 0}
+    .nav-icon{width:16px;text-align:center;font-size:14px;opacity:.8}
+    .nav-badge{margin-left:auto;min-width:20px;height:18px;border-radius:9px;background:var(--bg4);color:var(--muted);font-size:10px;font-weight:700;display:inline-grid;place-items:center;padding:0 5px}
+    .nav-item.active .nav-badge{background:rgba(88,166,255,.2);color:var(--blue)}
+
+    .sidebar-footer{margin-top:auto;padding:14px 12px;border-top:1px solid var(--border)}
+    .storage-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius2);padding:12px}
+    .storage-card .storage-icon{font-size:18px;margin-bottom:8px}
+    .storage-card strong{display:block;font-size:12px;font-weight:700;color:var(--ink2);margin-bottom:4px}
+    .storage-card p{font-size:11px;color:var(--muted);line-height:1.45}
+    .storage-dot{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;margin-right:5px;animation:pulse 2s infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+    /* ─── MAIN ───────────────────────────────── */
+    .main{min-width:0;padding:0;display:flex;flex-direction:column}
+
+    /* ─── TOPBAR ─────────────────────────────── */
+    .topbar{
+      position:sticky;top:0;z-index:15;
+      display:flex;align-items:center;gap:12px;
+      padding:14px 28px;
+      background:rgba(13,17,23,.85);
+      backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+      border-bottom:1px solid var(--border);
+    }
+    .mobile-toggle{display:none;border:1px solid var(--border);background:var(--bg3);color:var(--ink2);border-radius:var(--radius3);padding:8px 10px;font-size:13px}
+    .topbar-title{flex:1}
+    .topbar-title h2{font-family:var(--font-display);font-size:22px;font-weight:400;color:var(--ink);letter-spacing:-.3px}
+    .topbar-title p{font-size:12px;color:var(--muted);margin-top:2px;font-weight:400}
+    .topbar-right{display:flex;align-items:center;gap:8px}
+    .storage-pill{
+      display:flex;align-items:center;gap:6px;
+      background:var(--bg3);border:1px solid var(--border);
+      border-radius:999px;padding:6px 12px;
+      font-size:11px;font-weight:600;color:var(--muted);white-space:nowrap;
     }
 
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
+    /* ─── CONTENT ────────────────────────────── */
+    .content{padding:24px 28px;flex:1}
+    .section{margin-bottom:20px}
+
+    /* ─── CARDS ──────────────────────────────── */
+    .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius)}
+    .card-body{padding:20px}
+    .card-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;border-bottom:1px solid var(--border)}
+    .card-header h3{font-size:15px;font-weight:700;color:var(--ink)}
+    .card-header .meta{font-size:12px;color:var(--muted);font-weight:500}
+
+    /* ─── HERO ───────────────────────────────── */
+    .hero{
+      background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);
+      padding:24px;margin-bottom:20px;
+      position:relative;overflow:hidden;
     }
-
-    html {
-      scroll-behavior: smooth;
+    .hero::before{
+      content:'';position:absolute;top:-60px;right:-60px;
+      width:280px;height:280px;border-radius:50%;
+      background:radial-gradient(circle,rgba(88,166,255,.08),transparent 65%);
+      pointer-events:none;
     }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-      background:
-        radial-gradient(circle at top left, rgba(37, 99, 235, .16), transparent 36%),
-        radial-gradient(circle at top right, rgba(124, 58, 237, .12), transparent 34%),
-        var(--bg);
-      color: var(--text);
-      padding: 12px;
+    .hero::after{
+      content:'Ψ';position:absolute;bottom:-20px;right:20px;
+      font-family:var(--font-display);font-size:120px;font-style:italic;
+      color:rgba(88,166,255,.04);line-height:1;pointer-events:none;
+      user-select:none;
     }
-
-    .app {
-      width: 100%;
-      max-width: 430px;
-      margin: 0 auto;
-      padding-bottom: 24px;
+    .hero-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:20px}
+    .hero-top h3{font-family:var(--font-display);font-size:26px;font-weight:400;color:var(--ink)}
+    .hero-top p{margin-top:6px;font-size:13px;color:var(--muted);line-height:1.5;max-width:500px}
+    .hero-date{text-align:right;font-size:12px;color:var(--muted)}
+    .hero-date strong{display:block;font-size:18px;font-weight:700;color:var(--ink2);margin-bottom:2px}
+    .hero-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .hero-stat{
+      background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius2);
+      padding:16px;position:relative;overflow:hidden;
     }
+    .hero-stat-icon{font-size:20px;margin-bottom:10px;opacity:.7}
+    .hero-stat strong{display:block;font-size:30px;font-weight:700;line-height:1;color:var(--ink)}
+    .hero-stat span{display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-top:5px}
+    .hero-stat.blue strong{color:var(--blue)} .hero-stat.blue{border-color:rgba(88,166,255,.2);background:rgba(88,166,255,.04)}
+    .hero-stat.green strong{color:var(--green)} .hero-stat.green{border-color:rgba(63,185,80,.2);background:rgba(63,185,80,.04)}
+    .hero-stat.orange strong{color:var(--orange)} .hero-stat.orange{border-color:rgba(255,166,87,.2);background:rgba(255,166,87,.04)}
+    .hero-stat.red strong{color:var(--red)} .hero-stat.red{border-color:rgba(248,81,73,.2);background:rgba(248,81,73,.04)}
 
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin: 4px 0 12px;
+    /* ─── STAT CARDS ROW ─────────────────────── */
+    .stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+    .stat-card{
+      background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);
+      padding:18px;
     }
+    .stat-card-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px}
+    .stat-card strong{display:block;font-size:28px;font-weight:700;color:var(--ink);letter-spacing:-1px;line-height:1}
+    .stat-card small{display:block;margin-top:5px;font-size:12px;color:var(--muted)}
+    .stat-trend{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:600;margin-top:6px;padding:3px 7px;border-radius:999px}
+    .trend-up{color:var(--green);background:rgba(63,185,80,.12)}
+    .trend-warn{color:var(--orange);background:rgba(255,166,87,.12)}
+    .trend-danger{color:var(--red);background:rgba(248,81,73,.12)}
+    .trend-neutral{color:var(--muted);background:var(--bg4)}
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
+    /* ─── GRID MAIN ──────────────────────────── */
+    .grid-main{display:grid;grid-template-columns:1fr 340px;gap:16px;margin-bottom:20px;align-items:start}
+
+    /* ─── BUTTONS ────────────────────────────── */
+    .btn{
+      border:0;border-radius:var(--radius3);
+      padding:9px 14px;font-size:13px;font-weight:600;
+      display:inline-flex;align-items:center;justify-content:center;gap:7px;
+      min-height:38px;transition:var(--transition);white-space:nowrap;
     }
+    .btn-primary{background:var(--blue2);color:#fff;box-shadow:0 4px 14px rgba(31,111,235,.3)}
+    .btn-primary:hover{background:#388bfd;box-shadow:0 4px 20px rgba(31,111,235,.5)}
+    .btn-secondary{background:var(--bg3);color:var(--ink2);border:1px solid var(--border)}
+    .btn-secondary:hover{background:var(--bg4);border-color:var(--border2)}
+    .btn-danger{background:rgba(218,54,51,.15);color:var(--red);border:1px solid rgba(218,54,51,.3)}
+    .btn-danger:hover{background:var(--red2);color:#fff}
+    .btn-success{background:var(--green2);color:#fff}
+    .btn-success:hover{background:#2ea043}
+    .btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}
+    .btn-ghost:hover{color:var(--ink);border-color:var(--border2)}
+    .btn-sm{padding:7px 11px;font-size:12px;min-height:32px;border-radius:6px}
+    .btn-xs{padding:5px 9px;font-size:11px;min-height:28px;border-radius:5px}
 
-    .logo {
-      width: 44px;
-      height: 44px;
-      border-radius: 16px;
-      background: linear-gradient(135deg, var(--blue), var(--purple));
-      box-shadow: 0 12px 24px rgba(37, 99, 235, .22);
-      display: grid;
-      place-items: center;
-      color: white;
-      font-weight: 900;
-      font-size: 18px;
+    /* ─── FORM ───────────────────────────────── */
+    .form{display:grid;gap:14px}
+    .form-group{display:grid;gap:6px}
+    .form-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+    .form-label span{color:var(--red);margin-left:2px}
+    input[type=text],input[type=number],input[type=tel],input[type=date],input[type=time],input[type=search],select,textarea{
+      width:100%;background:var(--bg3);border:1px solid var(--border);
+      border-radius:var(--radius3);padding:9px 12px;
+      color:var(--ink);font-size:13px;outline:none;
+      transition:var(--transition);min-height:38px;
     }
+    input:focus,select:focus,textarea:focus{border-color:var(--blue2);box-shadow:0 0 0 3px rgba(31,111,235,.2)}
+    select option{background:var(--bg3)}
+    textarea{min-height:80px;resize:vertical;line-height:1.5}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .form-section-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding-bottom:8px;border-bottom:1px solid var(--border);margin:4px 0 2px}
 
-    .brand h1 {
-      margin: 0;
-      font-size: 22px;
-      line-height: 1.05;
-      letter-spacing: -.6px;
+    /* ─── PILLS / BADGES ─────────────────────── */
+    .badge{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:3px 8px;font-size:11px;font-weight:700;white-space:nowrap}
+    .badge-blue{color:var(--blue);background:rgba(88,166,255,.12);border:1px solid rgba(88,166,255,.2)}
+    .badge-purple{color:var(--purple);background:rgba(188,140,255,.12);border:1px solid rgba(188,140,255,.2)}
+    .badge-green{color:var(--green);background:rgba(63,185,80,.12);border:1px solid rgba(63,185,80,.2)}
+    .badge-orange{color:var(--orange);background:rgba(255,166,87,.12);border:1px solid rgba(255,166,87,.2)}
+    .badge-red{color:var(--red);background:rgba(248,81,73,.12);border:1px solid rgba(248,81,73,.2)}
+    .badge-gray{color:var(--muted);background:var(--bg4);border:1px solid var(--border)}
+    .risk-Bajo{color:#3fb950;background:rgba(63,185,80,.1);border:1px solid rgba(63,185,80,.25)}
+    .risk-Medio{color:var(--orange);background:rgba(255,166,87,.1);border:1px solid rgba(255,166,87,.25)}
+    .risk-Alto{color:var(--red);background:rgba(248,81,73,.1);border:1px solid rgba(248,81,73,.25)}
+    .status-Activo{color:var(--green);background:rgba(63,185,80,.1);border:1px solid rgba(63,185,80,.25)}
+    .status-En-pausa{color:var(--orange);background:rgba(255,166,87,.1);border:1px solid rgba(255,166,87,.25)}
+    .status-Cerrado{color:var(--muted);background:var(--bg4);border:1px solid var(--border)}
+
+    /* ─── TABLE ──────────────────────────────── */
+    .table-wrap{overflow:auto;border-radius:var(--radius2);border:1px solid var(--border)}
+    table{width:100%;border-collapse:collapse;min-width:900px}
+    th,td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
+    th{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);background:var(--bg3)}
+    tr:last-child td{border-bottom:0}
+    tr:hover td{background:var(--bg3)}
+    .name-cell strong{font-size:14px;font-weight:600;color:var(--ink)}
+    .name-cell span{font-size:12px;color:var(--muted);margin-top:3px;display:block}
+    td{font-size:13px;color:var(--ink2)}
+    .row-actions{display:flex;gap:6px;flex-wrap:wrap}
+    .empty-state{text-align:center;padding:40px 20px;color:var(--muted)}
+    .empty-state .empty-icon{font-size:36px;margin-bottom:12px;opacity:.4}
+    .empty-state p{font-size:13px}
+
+    /* ─── APPOINTMENTS ───────────────────────── */
+    .appointment-item{
+      display:flex;gap:12px;align-items:flex-start;
+      padding:12px;border-radius:var(--radius2);border:1px solid var(--border);
+      background:var(--bg3);margin-bottom:8px;transition:var(--transition);
     }
-
-    .brand p {
-      margin: 2px 0 0;
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 600;
+    .appointment-item:hover{border-color:var(--border2)}
+    .date-box{
+      width:44px;min-width:44px;height:48px;
+      border-radius:10px;background:var(--bg4);border:1px solid var(--border);
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      font-size:18px;font-weight:700;color:var(--blue);line-height:1;
     }
+    .date-box small{font-size:9px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-top:2px;letter-spacing:.06em}
+    .appointment-info{flex:1;min-width:0}
+    .appointment-info strong{font-size:13px;font-weight:600;color:var(--ink);display:block}
+    .appointment-info span{font-size:12px;color:var(--muted);margin-top:3px;display:block}
 
-    .counter {
-      padding: 9px 11px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.8);
-      border: 1px solid rgba(255,255,255,.9);
-      box-shadow: var(--shadow);
-      font-size: 12px;
-      font-weight: 800;
-      color: #1d4ed8;
-      white-space: nowrap;
+    /* ─── ALERTS ─────────────────────────────── */
+    .alert-item{
+      display:flex;gap:12px;align-items:flex-start;
+      padding:12px;border-radius:var(--radius2);border-left:3px solid;
+      background:var(--bg3);margin-bottom:8px;
     }
+    .alert-item.alert-red{border-color:var(--red);background:rgba(248,81,73,.05)}
+    .alert-item.alert-orange{border-color:var(--orange);background:rgba(255,166,87,.05)}
+    .alert-item.alert-blue{border-color:var(--blue);background:rgba(88,166,255,.05)}
+    .alert-item.alert-ok{border-color:var(--green);background:rgba(63,185,80,.05)}
+    .alert-dot{width:28px;min-width:28px;height:28px;border-radius:8px;display:grid;place-items:center;font-size:12px;font-weight:700}
+    .alert-red .alert-dot{background:rgba(248,81,73,.2);color:var(--red)}
+    .alert-orange .alert-dot{background:rgba(255,166,87,.2);color:var(--orange)}
+    .alert-blue .alert-dot{background:rgba(88,166,255,.2);color:var(--blue)}
+    .alert-ok .alert-dot{background:rgba(63,185,80,.2);color:var(--green)}
+    .alert-content strong{font-size:13px;font-weight:600;display:block;color:var(--ink2)}
+    .alert-content p{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.4}
 
-    .card {
-      background: rgba(255,255,255,.9);
-      border: 1px solid rgba(255,255,255,.94);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 14px;
-      margin-bottom: 12px;
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
+    /* ─── CHART ──────────────────────────────── */
+    .chart-row{display:grid;gap:8px}
+    .chart-bar{display:grid;grid-template-columns:110px 1fr 30px;gap:10px;align-items:center}
+    .chart-name{font-size:12px;color:var(--ink2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .chart-track{height:8px;background:var(--bg4);border-radius:999px;overflow:hidden}
+    .chart-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--blue2),var(--blue));transition:width .5s ease}
+    .chart-fill.orange{background:linear-gradient(90deg,var(--orange2),var(--orange))}
+    .chart-fill.red{background:linear-gradient(90deg,var(--red2),var(--red))}
+    .chart-fill.green{background:linear-gradient(90deg,var(--green2),var(--green))}
+    .chart-count{font-size:12px;font-weight:700;color:var(--muted);text-align:right}
+
+    /* ─── TOOLS GRID ─────────────────────────── */
+    .tools-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    .tool-btn{
+      display:flex;flex-direction:column;align-items:flex-start;gap:4px;
+      padding:14px;border:1px solid var(--border);border-radius:var(--radius2);
+      background:var(--bg3);color:var(--ink2);font-size:12px;font-weight:500;
+      transition:var(--transition);text-align:left;
     }
+    .tool-btn:hover{border-color:var(--border2);background:var(--bg4);color:var(--ink)}
+    .tool-btn .tool-icon{font-size:18px;margin-bottom:2px}
+    .tool-btn.danger{color:var(--red);border-color:rgba(248,81,73,.2)}
+    .tool-btn.danger:hover{background:rgba(248,81,73,.08)}
+    .tool-btn.success{color:var(--green);border-color:rgba(63,185,80,.2)}
+    .tool-btn.success:hover{background:rgba(63,185,80,.08)}
 
-    .storage-card {
-      padding: 12px 14px;
-      border-radius: 20px;
-      background: rgba(255,255,255,.86);
+    /* ─── MODAL ──────────────────────────────── */
+    .modal-backdrop{
+      position:fixed;inset:0;background:rgba(0,0,0,.7);
+      display:none;align-items:flex-start;justify-content:center;
+      padding:20px;z-index:50;overflow-y:auto;
+      backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
     }
-
-    .storage-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      align-items: center;
-      margin-bottom: 9px;
+    .modal-backdrop.open{display:flex}
+    .modal{
+      width:min(1080px,100%);background:var(--bg2);
+      border:1px solid var(--border);border-radius:var(--radius);
+      box-shadow:0 32px 80px rgba(0,0,0,.6);
+      display:flex;flex-direction:column;max-height:90vh;
+      margin:auto;
     }
-
-    .storage-title {
-      font-size: 13px;
-      font-weight: 900;
+    .modal-header{
+      display:flex;align-items:center;justify-content:space-between;gap:14px;
+      padding:20px 24px;border-bottom:1px solid var(--border);flex-shrink:0;
     }
-
-    .storage-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 9px;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 900;
-      color: #166534;
-      background: #dcfce7;
-      white-space: nowrap;
+    .modal-header .patient-name{font-family:var(--font-display);font-size:22px;font-weight:400;color:var(--ink)}
+    .modal-header .patient-sub{font-size:12px;color:var(--muted);margin-top:4px;font-weight:500}
+    .modal-header .patient-badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+    .modal-tabs{
+      display:flex;gap:2px;padding:10px 16px;border-bottom:1px solid var(--border);
+      overflow-x:auto;flex-shrink:0;background:var(--bg3);
     }
-
-    .storage-pill.warn {
-      color: #92400e;
-      background: #fef3c7;
+    .tab-btn{
+      border:0;background:transparent;color:var(--muted);
+      border-radius:6px;padding:7px 14px;font-size:13px;font-weight:500;
+      white-space:nowrap;transition:var(--transition);
     }
+    .tab-btn:hover{background:var(--bg4);color:var(--ink2)}
+    .tab-btn.active{background:var(--bg2);color:var(--ink);font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+    .tab-panel{display:none}
+    .tab-panel.active{display:block}
+    .modal-body{overflow-y:auto;padding:20px 24px;flex:1}
 
-    .storage-note {
-      color: var(--muted);
-      font-size: 11px;
-      line-height: 1.35;
-      margin: 0;
+    /* ─── PATIENT DETAIL LAYOUT ──────────────── */
+    .patient-layout{display:grid;grid-template-columns:1fr 280px;gap:16px}
+    .detail-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+    .detail-box{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius2);padding:12px}
+    .detail-box b{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);display:block;margin-bottom:5px}
+    .detail-box span{font-size:13px;color:var(--ink2);line-height:1.4;white-space:pre-wrap}
+    .side-summary{display:grid;gap:10px}
+    .summary-stat{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius2);padding:14px}
+    .summary-stat strong{display:block;font-size:22px;font-weight:700;color:var(--ink)}
+    .summary-stat span{display:block;font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-top:3px}
+
+    /* ─── SUBFORM ────────────────────────────── */
+    .subform{
+      background:var(--bg3);border:1px dashed var(--border2);
+      border-radius:var(--radius2);padding:16px;margin-bottom:14px;
+      display:grid;gap:12px;
     }
+    .records{display:grid;gap:8px}
+    .record{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius2);padding:14px}
+    .record-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:6px}
+    .record-head strong{font-size:13px;font-weight:600;color:var(--ink)}
+    .record-head span{font-size:12px;color:var(--muted);font-weight:500;white-space:nowrap}
+    .record p{font-size:12px;color:var(--muted);line-height:1.5;white-space:pre-wrap}
+    .record-actions{display:flex;justify-content:flex-end;gap:6px;margin-top:10px}
 
-    .section-title {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 12px;
+    /* ─── TOAST ──────────────────────────────── */
+    .toast{
+      position:fixed;right:20px;bottom:20px;
+      background:var(--bg4);border:1px solid var(--border2);color:var(--ink);
+      border-radius:var(--radius2);padding:12px 16px;
+      box-shadow:var(--shadow);font-size:13px;font-weight:500;
+      opacity:0;transform:translateY(8px) scale(.98);
+      pointer-events:none;transition:.2s cubic-bezier(.4,0,.2,1);z-index:90;
+      display:flex;align-items:center;gap:8px;
     }
+    .toast.show{opacity:1;transform:translateY(0) scale(1)}
+    .toast-icon{font-size:16px}
 
-    .section-title h2 {
-      margin: 0;
-      font-size: 18px;
-      letter-spacing: -.35px;
+    /* ─── FILTERS ────────────────────────────── */
+    .filters{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:10px;margin-bottom:14px}
+
+    /* ─── MINI SEARCH ────────────────────────── */
+    .search-wrap{position:relative}
+    .search-wrap input{padding-left:34px}
+    .search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--muted);pointer-events:none}
+
+    /* ─── PRINT BUTTON ───────────────────────── */
+    .print-hide{} @media print{.sidebar,.topbar,.form-card,.filters,.tools-grid,.row-actions,.modal-backdrop,.storage-pill,.btn,.mobile-toggle,.print-hide{display:none!important}.shell{display:block}.content{padding:0}.hero{border:1px solid #ccc;color:#000;background:#fff}.hero::after,.hero::before{display:none}}
+
+    /* ─── MOBILE OVERLAY ─────────────────────── */
+    .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(2px);z-index:18}
+    body.sidebar-open .sidebar-overlay{display:block}
+
+    /* ─── SCROLLBAR ──────────────────────────── */
+    ::-webkit-scrollbar{width:6px;height:6px}
+    ::-webkit-scrollbar-track{background:transparent}
+    ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:999px}
+    ::-webkit-scrollbar-thumb:hover{background:var(--muted2)}
+
+    /* ─── CLOSE BTN ──────────────────────────── */
+    .close-btn{
+      width:32px;height:32px;border:1px solid var(--border);
+      background:var(--bg3);color:var(--muted);border-radius:8px;
+      display:grid;place-items:center;font-size:16px;
+      transition:var(--transition);flex-shrink:0;
     }
+    .close-btn:hover{background:var(--bg4);color:var(--ink);border-color:var(--border2)}
 
-    .section-title span {
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 700;
+    /* ─── DIVIDER ────────────────────────────── */
+    .divider{height:1px;background:var(--border);margin:16px 0}
+
+    /* ─── RESPONSIVE ─────────────────────────── */
+    @media(max-width:1100px){
+      .shell{display:block}
+      .sidebar{position:fixed;inset:0 auto 0 0;width:min(80vw,280px);height:100dvh;transform:translateX(-110%);transition:transform .22s ease;box-shadow:20px 0 60px rgba(0,0,0,.5)}
+      .sidebar.open{transform:translateX(0)}
+      .mobile-toggle{display:inline-flex}
+      .grid-main,.patient-layout{grid-template-columns:1fr}
+      .hero-stats,.stat-row{grid-template-columns:1fr 1fr}
+      .detail-grid{grid-template-columns:1fr 1fr}
+      .topbar{padding:12px 16px}
+      .content{padding:16px}
+      .filters{grid-template-columns:1fr 1fr}
     }
-
-    .form {
-      display: grid;
-      gap: 10px;
+    @media(max-width:680px){
+      .hero-stats,.stat-row{grid-template-columns:1fr 1fr}
+      .filters{grid-template-columns:1fr}
+      .modal-backdrop{padding:0;align-items:flex-end}
+      .modal{max-height:95dvh;border-radius:var(--radius) var(--radius) 0 0;margin:0}
+      .grid-2,.grid-3,.grid-4{grid-template-columns:1fr}
+      .tools-grid{grid-template-columns:1fr 1fr}
+      .detail-grid{grid-template-columns:1fr}
+      .table-wrap{overflow:visible;border:0}
+      .table-wrap table{min-width:0;width:100%;display:block}
+      .table-wrap thead{display:none}
+      .table-wrap tbody{display:grid;gap:10px}
+      .table-wrap tr{display:block;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);padding:14px}
+      .table-wrap td{display:grid;grid-template-columns:100px 1fr;gap:8px;align-items:start;border-bottom:1px solid var(--border);padding:9px 0;font-size:13px}
+      .table-wrap td:last-child{border-bottom:0}
+      .table-wrap td::before{content:attr(data-label);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding-top:2px}
+      .row-actions{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+      .row-actions .btn{width:100%;justify-content:center}
     }
-
-    label {
-      display: grid;
-      gap: 6px;
-      color: #374151;
-      font-size: 11px;
-      font-weight: 900;
-      letter-spacing: .04em;
-      text-transform: uppercase;
-    }
-
-    input, select, textarea {
-      width: 100%;
-      border: 1px solid var(--line);
-      background: #fff;
-      border-radius: 16px;
-      padding: 12px 13px;
-      color: var(--text);
-      font: inherit;
-      font-size: 15px;
-      outline: none;
-      min-height: 46px;
-    }
-
-    input:focus, select:focus, textarea:focus {
-      border-color: rgba(37, 99, 235, .5);
-      box-shadow: 0 0 0 4px rgba(37, 99, 235, .10);
-    }
-
-    textarea {
-      min-height: 78px;
-      resize: vertical;
-      line-height: 1.35;
-    }
-
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .btn-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 2px;
-    }
-
-    button {
-      border: 0;
-      border-radius: 16px;
-      padding: 12px 13px;
-      min-height: 46px;
-      font: inherit;
-      font-size: 14px;
-      font-weight: 900;
-      cursor: pointer;
-    }
-
-    .btn-primary {
-      color: white;
-      background: linear-gradient(135deg, var(--blue), var(--purple));
-      box-shadow: 0 12px 22px rgba(37, 99, 235, .24);
-    }
-
-    .btn-soft {
-      color: #1d4ed8;
-      background: #eaf1ff;
-    }
-
-    .btn-danger {
-      color: white;
-      background: linear-gradient(135deg, #ef4444, #b91c1c);
-    }
-
-    .btn-light {
-      color: #374151;
-      background: #f3f4f6;
-      border: 1px solid var(--line);
-    }
-
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-    }
-
-    .stat {
-      background: #fff;
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 10px 8px;
-      text-align: center;
-    }
-
-    .stat strong {
-      display: block;
-      font-size: 19px;
-      line-height: 1;
-      letter-spacing: -.4px;
-    }
-
-    .stat span {
-      display: block;
-      margin-top: 5px;
-      color: var(--muted);
-      font-size: 10px;
-      font-weight: 800;
-      text-transform: uppercase;
-      line-height: 1.1;
-    }
-
-    .filters {
-      display: grid;
-      gap: 9px;
-    }
-
-    .patient-list {
-      display: grid;
-      gap: 10px;
-    }
-
-    .patient-card {
-      background: #fff;
-      border: 1px solid var(--line);
-      border-radius: 20px;
-      padding: 12px;
-    }
-
-    .patient-head {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      align-items: flex-start;
-      margin-bottom: 10px;
-    }
-
-    .patient-name {
-      margin: 0;
-      font-size: 17px;
-      letter-spacing: -.25px;
-      line-height: 1.15;
-    }
-
-    .patient-date {
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 800;
-      white-space: nowrap;
-      padding-top: 2px;
-    }
-
-    .tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin: 8px 0;
-    }
-
-    .tag {
-      display: inline-flex;
-      padding: 6px 9px;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 900;
-      color: #1e3a8a;
-      background: #eaf1ff;
-    }
-
-    .tag.alt {
-      color: #5b21b6;
-      background: #f1e9ff;
-    }
-
-    .data-line {
-      display: grid;
-      gap: 3px;
-      margin-top: 8px;
-      font-size: 13px;
-      line-height: 1.35;
-    }
-
-    .data-line b {
-      color: #374151;
-    }
-
-    .data-line span {
-      color: #4b5563;
-    }
-
-    .patient-actions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-top: 12px;
-    }
-
-    .patient-actions button {
-      min-height: 40px;
-      padding: 9px;
-      border-radius: 14px;
-      font-size: 13px;
-    }
-
-    .empty {
-      text-align: center;
-      color: var(--muted);
-      padding: 24px 12px;
-      font-size: 14px;
-      line-height: 1.4;
-    }
-
-    .chart {
-      display: grid;
-      gap: 9px;
-    }
-
-    .bar {
-      display: grid;
-      grid-template-columns: 96px 1fr 24px;
-      gap: 8px;
-      align-items: center;
-      font-size: 12px;
-    }
-
-    .bar-name {
-      color: #374151;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .track {
-      height: 9px;
-      border-radius: 999px;
-      background: #eef2f7;
-      overflow: hidden;
-    }
-
-    .fill {
-      height: 100%;
-      border-radius: 999px;
-      background: linear-gradient(90deg, var(--blue), var(--purple));
-    }
-
-    .bar-count {
-      text-align: right;
-      font-weight: 900;
-    }
-
-    .tools {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 9px;
-    }
-
-    .file-input {
-      display: none;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-    @media (min-width: 780px) {
-      body {
-        padding: 18px;
-      }
-
-      .app {
-        max-width: 980px;
-      }
-
-      .desktop-grid {
-        display: grid;
-        grid-template-columns: 360px 1fr;
-        gap: 14px;
-        align-items: start;
-      }
-
-      .patient-list {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-    }
-
-    @media (max-width: 370px) {
-      body {
-        padding: 8px;
-      }
-
-      .brand h1 {
-        font-size: 20px;
-      }
-
-      .grid-2, .btn-row, .patient-actions, .tools {
-        grid-template-columns: 1fr;
-      }
-
-      .stats {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    @media print {
-      body {
-        background: white;
-        padding: 0;
-      }
-
-      .topbar, .form-card, .filters-card, .storage-card, .tools {
-        display: none !important;
-      }
-
-      .app {
-        max-width: none;
-      }
-
-      .card, .patient-card {
-        box-shadow: none;
-        border: 1px solid #ddd;
-      }
+    @media(max-width:400px){
+      .hero-stats,.stat-row{grid-template-columns:1fr}
     }
   </style>
 </head>
 <body>
-  <main class="app">
-    <header class="topbar">
-      <div class="brand">
-        <div class="logo">Ψ</div>
-        <div>
-          <h1>Pacientes</h1>
-          <p>Control psicológico privado</p>
-        </div>
-      </div>
-      <div class="counter"><span id="topTotal">0</span> registros</div>
-    </header>
-
-    <section class="card storage-card">
-      <div class="storage-row">
-        <div class="storage-title">Guardado local</div>
-        <div id="storageStatus" class="storage-pill warn">Verificando</div>
-      </div>
-      <p id="storageNote" class="storage-note">
-        El sistema intentará guardar en IndexedDB y una copia espejo en localStorage. Haz respaldo JSON cada cierto tiempo.
-      </p>
-    </section>
-
-    <div class="desktop-grid">
-      <section class="card form-card">
-        <div class="section-title">
-          <h2 id="formTitle">Nuevo paciente</h2>
-          <span id="formMode">Registro</span>
+  <div class="shell">
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-inner">
+        <div class="brand">
+          <div class="logo">Ψ</div>
+          <div class="brand-text">
+            <h1>Control Clínico</h1>
+            <p>Módulo psicológico</p>
+          </div>
         </div>
 
-        <form id="patientForm" class="form">
-          <input type="hidden" id="patientId" />
+        <div class="nav-section">
+          <div class="nav-label">Panel</div>
+          <button class="nav-item active" type="button" onclick="scrollToSection('dashboard')">
+            <span class="nav-icon">⌂</span> Resumen
+            <span class="nav-badge" id="navTotal">0</span>
+          </button>
+          <button class="nav-item" type="button" onclick="scrollToSection('agenda')">
+            <span class="nav-icon">◷</span> Agenda
+            <span class="nav-badge" id="navAgenda">0</span>
+          </button>
+          <button class="nav-item" type="button" onclick="scrollToSection('alertas')">
+            <span class="nav-icon">⚑</span> Alertas
+            <span class="nav-badge" id="navAlerts">0</span>
+          </button>
+        </div>
 
-          <label>
-            Nombre completo
-            <input id="nombre" type="text" placeholder="Ejemplo: María López" autocomplete="off" required />
-          </label>
+        <div class="nav-section">
+          <div class="nav-label">Expedientes</div>
+          <button class="nav-item" type="button" onclick="scrollToSection('registro')">
+            <span class="nav-icon">＋</span> Nuevo paciente
+          </button>
+          <button class="nav-item" type="button" onclick="scrollToSection('pacientes')">
+            <span class="nav-icon">◉</span> Pacientes
+            <span class="nav-badge" id="navVisible">0</span>
+          </button>
+        </div>
 
-          <div class="grid-2">
-            <label>
-              DNI
-              <input id="dni" type="text" placeholder="12345678" maxlength="12" inputmode="numeric" autocomplete="off" required />
-            </label>
+        <div class="nav-section">
+          <div class="nav-label">Análisis</div>
+          <button class="nav-item" type="button" onclick="scrollToSection('analitica')">
+            <span class="nav-icon">▦</span> Distribución
+          </button>
+        </div>
 
-            <label>
-              Fecha
-              <input id="fecha" type="date" required />
-            </label>
+        <div class="nav-section" style="border-bottom:0">
+          <div class="nav-label">Sistema</div>
+          <button class="nav-item" type="button" onclick="scrollToSection('respaldo')">
+            <span class="nav-icon">↓</span> Respaldo
+          </button>
+        </div>
+
+        <div class="sidebar-footer">
+          <div class="storage-card">
+            <div class="storage-icon">💾</div>
+            <strong><span class="storage-dot"></span>Almacenamiento local</strong>
+            <p>Datos guardados en este navegador. Realiza respaldos JSON periódicamente.</p>
           </div>
-
-          <label>
-            Programa
-            <select id="programa" required>
-              <option value="">Seleccionar</option>
-              <option>Familiar</option>
-              <option>De pareja</option>
-              <option>Ansiedad</option>
-              <option>Depresión</option>
-              <option>Autoestima</option>
-              <option>Duelo</option>
-              <option>Estrés laboral</option>
-              <option>Adolescente</option>
-              <option>Infantil</option>
-              <option>Orientación vocacional</option>
-            </select>
-          </label>
-
-          <label>
-            Categoría
-            <select id="categoria" required>
-              <option value="">Seleccionar</option>
-              <option>Evaluación inicial</option>
-              <option>Seguimiento</option>
-              <option>Terapia individual</option>
-              <option>Terapia familiar</option>
-              <option>Terapia de pareja</option>
-              <option>Crisis emocional</option>
-              <option>Ansiedad</option>
-              <option>Estado de ánimo</option>
-              <option>Conducta</option>
-              <option>Alta o cierre</option>
-            </select>
-          </label>
-
-          <label>
-            Motivo de consulta
-            <textarea id="motivo" placeholder="Describe brevemente el motivo..." required></textarea>
-          </label>
-
-          <label>
-            Observaciones
-            <textarea id="observaciones" placeholder="Notas internas o próximos pasos..."></textarea>
-          </label>
-
-          <div class="btn-row">
-            <button class="btn-primary" type="submit" id="saveButton">Guardar</button>
-            <button class="btn-soft" type="button" onclick="clearForm()">Limpiar</button>
-          </div>
-        </form>
-      </section>
-
-      <section>
-        <section class="card">
-          <div class="stats">
-            <div class="stat">
-              <strong id="totalPacientes">0</strong>
-              <span>Total</span>
-            </div>
-            <div class="stat">
-              <strong id="pacientesMes">0</strong>
-              <span>Mes</span>
-            </div>
-            <div class="stat">
-              <strong id="totalProgramas">0</strong>
-              <span>Programas</span>
-            </div>
-            <div class="stat">
-              <strong id="totalCategorias">0</strong>
-              <span>Categorías</span>
-            </div>
-          </div>
-        </section>
-
-        <section class="card filters-card">
-          <div class="filters">
-            <input id="search" type="search" placeholder="Buscar nombre, DNI, programa o motivo..." />
-            <select id="filterProgram">
-              <option value="">Todos los programas</option>
-              <option>Familiar</option>
-              <option>De pareja</option>
-              <option>Ansiedad</option>
-              <option>Depresión</option>
-              <option>Autoestima</option>
-              <option>Duelo</option>
-              <option>Estrés laboral</option>
-              <option>Adolescente</option>
-              <option>Infantil</option>
-              <option>Orientación vocacional</option>
-            </select>
-          </div>
-        </section>
-
-        <section class="card">
-          <div class="section-title">
-            <h2>Historial</h2>
-            <span id="visibleCount">0 visibles</span>
-          </div>
-          <div id="patientList" class="patient-list"></div>
-          <div id="emptyState" class="empty">Aún no hay pacientes registrados.</div>
-        </section>
-
-        <section class="card">
-          <div class="section-title">
-            <h2>Estadísticas</h2>
-            <span>Resumen</span>
-          </div>
-
-          <div class="section-title" style="margin-top:4px;">
-            <h2 style="font-size:15px;">Por programa</h2>
-          </div>
-          <div id="programChart" class="chart"></div>
-
-          <div class="section-title" style="margin-top:16px;">
-            <h2 style="font-size:15px;">Por categoría</h2>
-          </div>
-          <div id="categoryChart" class="chart"></div>
-        </section>
-
-        <section class="card">
-          <input class="file-input" id="importFile" type="file" accept="application/json,.json" />
-          <div class="tools">
-            <button class="btn-light" type="button" onclick="exportJSON()">Respaldo JSON</button>
-            <button class="btn-light" type="button" onclick="document.getElementById('importFile').click()">Restaurar JSON</button>
-            <button class="btn-light" type="button" onclick="exportCSV()">Exportar CSV</button>
-            <button class="btn-light" type="button" onclick="window.print()">Imprimir</button>
-            <button class="btn-danger" type="button" onclick="deleteAll()">Borrar todo</button>
-            <button class="btn-soft" type="button" onclick="clearForm()">Nuevo</button>
-          </div>
-        </section>
-      </section>
-    </div>
-  </main>
-
-  <script>
-    const DB_NAME = "ControlPacientesDB";
-    const DB_VERSION = 1;
-    const STORE_NAME = "state";
-    const DATA_KEY = "patients";
-    const LS_KEY = "control_pacientes_psicologia_ios_backup_v3";
-
-    let db = null;
-    let patients = [];
-    let storageMode = "memory";
-
-    const form = document.getElementById("patientForm");
-    const search = document.getElementById("search");
-    const filterProgram = document.getElementById("filterProgram");
-
-    const fields = {
-      id: document.getElementById("patientId"),
-      nombre: document.getElementById("nombre"),
-      dni: document.getElementById("dni"),
-      fecha: document.getElementById("fecha"),
-      programa: document.getElementById("programa"),
-      categoria: document.getElementById("categoria"),
-      motivo: document.getElementById("motivo"),
-      observaciones: document.getElementById("observaciones")
-    };
-
-    fields.fecha.valueAsDate = new Date();
-
-    boot();
-
-    async function boot() {
-      await initStorage();
-      patients = await loadPatients();
-      render();
-      saveNow();
-    }
-
-    async function initStorage() {
-      try {
-        db = await openDB();
-        storageMode = "indexeddb";
-        setStorageStatus("Guardado activo", false, "Se guardará en IndexedDB y también una copia espejo en localStorage.");
-      } catch (error) {
-        try {
-          testLocalStorage();
-          storageMode = "localstorage";
-          setStorageStatus("Modo compatible", true, "IndexedDB no está disponible aquí. Se usará localStorage. Se recomienda abrir desde Safari/Chrome normal o subir a hosting HTTPS.");
-        } catch (secondError) {
-          storageMode = "memory";
-          setStorageStatus("Sin persistencia segura", true, "Este navegador no permite guardar datos desde este archivo. Usa respaldo JSON o abre el HTML desde un enlace HTTPS.");
-        }
-      }
-    }
-
-    function openDB() {
-      return new Promise((resolve, reject) => {
-        if (!("indexedDB" in window)) {
-          reject(new Error("IndexedDB no soportado"));
-          return;
-        }
-
-        const request = indexedDB.open(DB_NAME, DB_VERSION);
-
-        request.onupgradeneeded = event => {
-          const database = event.target.result;
-          if (!database.objectStoreNames.contains(STORE_NAME)) {
-            database.createObjectStore(STORE_NAME);
-          }
-        };
-
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error || new Error("No se pudo abrir IndexedDB"));
-        request.onblocked = () => reject(new Error("IndexedDB bloqueado"));
-      });
-    }
-
-    function idbGet(key) {
-      return new Promise((resolve, reject) => {
-        const tx = db.transaction(STORE_NAME, "readonly");
-        const store = tx.objectStore(STORE_NAME);
-        const request = store.get(key);
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error);
-      });
-    }
-
-    function idbSet(key, value) {
-      return new Promise((resolve, reject) => {
-        const tx = db.transaction(STORE_NAME, "readwrite");
-        const store = tx.objectStore(STORE_NAME);
-        const request = store.put(value, key);
-        request.onsuccess = () => resolve(true);
-        request.onerror = () => reject(request.error);
-      });
-    }
-
-    function testLocalStorage() {
-      const testKey = LS_KEY + "_test";
-      localStorage.setItem(testKey, "1");
-      localStorage.removeItem(testKey);
-    }
-
-    async function loadPatients() {
-      let fromDB = null;
-      let fromLS = [];
-
-      try {
-        const raw = localStorage.getItem(LS_KEY);
-        fromLS = raw ? JSON.parse(raw) : [];
-      } catch (_) {
-        fromLS = [];
-      }
-
-      if (storageMode === "indexeddb" && db) {
-        try {
-          fromDB = await idbGet(DATA_KEY);
-        } catch (_) {
-          fromDB = null;
-        }
-      }
-
-      if (Array.isArray(fromDB)) return fromDB;
-      if (Array.isArray(fromLS)) return fromLS;
-      return [];
-    }
-
-    async function saveNow() {
-      const safeData = Array.isArray(patients) ? patients : [];
-
-      if (storageMode === "indexeddb" && db) {
-        try {
-          await idbSet(DATA_KEY, safeData);
-        } catch (_) {
-          setStorageStatus("Error al guardar", true, "No se pudo guardar en IndexedDB. Haz un respaldo JSON.");
-        }
-      }
-
-      try {
-        localStorage.setItem(LS_KEY, JSON.stringify(safeData));
-      } catch (_) {
-        if (storageMode !== "indexeddb") {
-          setStorageStatus("Sin localStorage", true, "El navegador bloqueó localStorage. Usa respaldo JSON.");
-        }
-      }
-
-      updateSavedTime();
-    }
-
-    function setStorageStatus(text, warn, note) {
-      const pill = document.getElementById("storageStatus");
-      const storageNote = document.getElementById("storageNote");
-      pill.textContent = text;
-      pill.classList.toggle("warn", !!warn);
-      storageNote.textContent = note;
-    }
-
-    function updateSavedTime() {
-      const pill = document.getElementById("storageStatus");
-      const now = new Date();
-      const time = now.toLocaleTimeString("es-PE", { hour: "2-digit", minute: "2-digit" });
-      if (storageMode === "indexeddb") {
-        pill.textContent = "Guardado " + time;
-        pill.classList.remove("warn");
-      } else if (storageMode === "localstorage") {
-        pill.textContent = "Local " + time;
-        pill.classList.add("warn");
-      }
-    }
-
-    form.addEventListener("submit", async function(event) {
-      event.preventDefault();
-
-      const patient = {
-        id: fields.id.value || makeId(),
-        nombre: fields.nombre.value.trim(),
-        dni: fields.dni.value.trim(),
-        fecha: fields.fecha.value,
-        programa: fields.programa.value,
-        categoria: fields.categoria.value,
-        motivo: fields.motivo.value.trim(),
-        observaciones: fields.observaciones.value.trim(),
-        actualizado: new Date().toISOString()
-      };
-
-      if (!patient.nombre || !patient.dni || !patient.fecha || !patient.programa || !patient.categoria || !patient.motivo) {
-        alert("Completa los campos obligatorios.");
-        return;
-      }
-
-      const index = patients.findIndex(p => p.id === patient.id);
-
-      if (index >= 0) {
-        patients[index] = patient;
-      } else {
-        patients.unshift(patient);
-      }
-
-      await saveNow();
-      clearForm();
-      render();
-    });
-
-    search.addEventListener("input", render);
-    filterProgram.addEventListener("change", render);
-
-    document.addEventListener("visibilitychange", () => {
-      if (document.visibilityState === "hidden") {
-        saveNow();
-      }
-    });
-
-    window.addEventListener("pagehide", saveNow);
-    window.addEventListener("beforeunload", saveNow);
-
-    document.getElementById("importFile").addEventListener("change", importJSON);
-
-    function makeId() {
-      if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
-      return "id-" + Date.now() + "-" + Math.random().toString(16).slice(2);
-    }
-
-    function clearForm() {
-      form.reset();
-      fields.id.value = "";
-      fields.fecha.valueAsDate = new Date();
-      document.getElementById("formTitle").textContent = "Nuevo paciente";
-      document.getElementById("formMode").textContent = "Registro";
-      document.getElementById("saveButton").textContent = "Guardar";
-    }
-
-    function editPatient(id) {
-      const p = patients.find(item => item.id === id);
-      if (!p) return;
-
-      fields.id.value = p.id;
-      fields.nombre.value = p.nombre;
-      fields.dni.value = p.dni;
-      fields.fecha.value = p.fecha;
-      fields.programa.value = p.programa;
-      fields.categoria.value = p.categoria;
-      fields.motivo.value = p.motivo;
-      fields.observaciones.value = p.observaciones || "";
-
-      document.getElementById("formTitle").textContent = "Editar paciente";
-      document.getElementById("formMode").textContent = "Edición";
-      document.getElementById("saveButton").textContent = "Actualizar";
-
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-
-    async function deletePatient(id) {
-      if (!confirm("¿Borrar este paciente?")) return;
-
-      patients = patients.filter(item => item.id !== id);
-      await saveNow();
-      render();
-    }
-
-    async function deleteAll() {
-      if (!patients.length) {
-        alert("No hay pacientes guardados.");
-        return;
-      }
-
-      if (!confirm("¿Borrar todos los pacientes guardados?")) return;
-
-      patients = [];
-      await saveNow();
-      clearForm();
-      render();
-    }
-
-    function filteredPatients() {
-      const q = search.value.toLowerCase().trim();
-      const program = filterProgram.value;
-
-      return patients.filter(p => {
-        const text = [
-          p.nombre,
-          p.dni,
-          p.fecha,
-          p.programa,
-          p.categoria,
-          p.motivo,
-          p.observaciones
-        ].join(" ").toLowerCase();
-
-        return (!q || text.includes(q)) && (!program || p.programa === program);
-      });
-    }
-
-    function render() {
-      const list = filteredPatients();
-      const container = document.getElementById("patientList");
-      const empty = document.getElementById("emptyState");
-
-      container.innerHTML = "";
-
-      list.forEach(p => {
-        const card = document.createElement("article");
-        card.className = "patient-card";
-        card.innerHTML = `
-          <div class="patient-head">
+        </div>
+      </div>
+    </aside>
+    <div id="sidebarOverlay" class="sidebar-overlay" onclick="closeSidebar()"></div>
+
+    <!-- MAIN -->
+    <main class="main">
+      <header class="topbar print-hide">
+        <button class="btn mobile-toggle" onclick="toggleSidebar()">☰</button>
+        <div class="topbar-title">
+          <h2>Dashboard Clínico</h2>
+          <p id="topbarDate">Consultorio psicológico</p>
+        </div>
+        <div class="topbar-right">
+          <div class="storage-pill"><span id="storageStatus">Verificando…</span></div>
+          <button class="btn btn-primary" onclick="scrollToSection('registro')">+ Nuevo paciente</button>
+        </div>
+      </header>
+
+      <div class="content">
+
+        <!-- HERO -->
+        <div id="dashboard" class="hero section">
+          <div class="hero-top">
             <div>
-              <h3 class="patient-name">${escapeHTML(p.nombre)}</h3>
-              <div class="tags">
-                <span class="tag">${escapeHTML(p.programa)}</span>
-                <span class="tag alt">${escapeHTML(p.categoria)}</span>
+              <h3>Resumen del consultorio</h3>
+              <p>Cada paciente tiene su expediente completo: datos, sesiones, citas, pagos, notas y documentos.</p>
+            </div>
+            <div class="hero-date" id="heroDate"></div>
+          </div>
+          <div class="hero-stats">
+            <div class="hero-stat blue">
+              <div class="hero-stat-icon">👥</div>
+              <strong id="heroActive">0</strong>
+              <span>Pacientes activos</span>
+            </div>
+            <div class="hero-stat green">
+              <div class="hero-stat-icon">📅</div>
+              <strong id="heroToday">0</strong>
+              <span>Citas hoy</span>
+            </div>
+            <div class="hero-stat orange">
+              <div class="hero-stat-icon">💳</div>
+              <strong id="heroPendingPay">0</strong>
+              <span>Pagos pendientes</span>
+            </div>
+            <div class="hero-stat red">
+              <div class="hero-stat-icon">⚠</div>
+              <strong id="heroHighRisk">0</strong>
+              <span>Riesgo alto</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- STAT CARDS -->
+        <div class="stat-row section">
+          <article class="stat-card">
+            <div class="stat-card-label">Total pacientes</div>
+            <strong id="totalPacientes">0</strong>
+            <small>Expedientes registrados</small>
+          </article>
+          <article class="stat-card">
+            <div class="stat-card-label">Sesiones totales</div>
+            <strong id="totalSesiones">0</strong>
+            <small>Suma acumulada</small>
+          </article>
+          <article class="stat-card">
+            <div class="stat-card-label">Citas programadas</div>
+            <strong id="totalCitas">0</strong>
+            <small>Citas futuras activas</small>
+          </article>
+          <article class="stat-card">
+            <div class="stat-card-label">Saldo pendiente</div>
+            <strong id="saldoPendiente">S/ 0</strong>
+            <small>Por cobrar en total</small>
+          </article>
+        </div>
+
+        <!-- GRID MAIN -->
+        <div class="grid-main">
+          <!-- FORM -->
+          <section id="registro" class="card form-card section">
+            <div class="card-header">
+              <div>
+                <h3 id="formTitle">Nuevo paciente</h3>
+                <div class="meta" id="formMode">Registro base · Complete todos los campos requeridos</div>
+              </div>
+              <button class="btn btn-ghost btn-sm" type="button" onclick="clearForm()">Limpiar</button>
+            </div>
+            <div class="card-body">
+              <form id="patientForm" class="form">
+                <input type="hidden" id="patientId">
+
+                <div class="form-section-title">Información personal</div>
+                <div class="form-group">
+                  <label class="form-label">Nombre completo <span>*</span></label>
+                  <input id="nombre" required placeholder="Ej: María López Ramírez" autocomplete="off">
+                </div>
+                <div class="grid-3">
+                  <div class="form-group">
+                    <label class="form-label">DNI / Documento <span>*</span></label>
+                    <input id="dni" required maxlength="15" placeholder="12345678" autocomplete="off">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Teléfono</label>
+                    <input id="telefono" type="tel" placeholder="999 999 999">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Edad</label>
+                    <input id="edad" type="number" min="1" max="120" placeholder="25">
+                  </div>
+                </div>
+                <div class="grid-3">
+                  <div class="form-group">
+                    <label class="form-label">Fecha de ingreso <span>*</span></label>
+                    <input id="fecha" type="date" required>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Estado</label>
+                    <select id="estado"><option>Activo</option><option>En pausa</option><option>Cerrado</option></select>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Riesgo inicial</label>
+                    <select id="riesgo"><option>Bajo</option><option>Medio</option><option>Alto</option></select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Responsable / Apoderado</label>
+                  <input id="responsable" placeholder="Opcional — nombre del tutor o familiar responsable">
+                </div>
+
+                <div class="form-section-title">Área clínica</div>
+                <div class="grid-2">
+                  <div class="form-group">
+                    <label class="form-label">Programa <span>*</span></label>
+                    <select id="programa" required>
+                      <option value="">Seleccionar programa</option>
+                      <option>Familiar</option><option>De pareja</option>
+                      <option>Ansiedad</option><option>Depresión</option>
+                      <option>Autoestima</option><option>Duelo</option>
+                      <option>Estrés laboral</option><option>Adolescente</option>
+                      <option>Infantil</option><option>Orientación vocacional</option>
+                      <option>Evaluación psicológica</option><option>Trauma</option>
+                      <option>Adicciones</option><option>TDAH</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Categoría <span>*</span></label>
+                    <select id="categoria" required>
+                      <option value="">Seleccionar categoría</option>
+                      <option>Evaluación inicial</option><option>Seguimiento</option>
+                      <option>Terapia individual</option><option>Terapia familiar</option>
+                      <option>Terapia de pareja</option><option>Crisis emocional</option>
+                      <option>Ansiedad</option><option>Estado de ánimo</option>
+                      <option>Conducta</option><option>Alta o cierre</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Motivo de consulta <span>*</span></label>
+                  <textarea id="motivo" required placeholder="Describe el motivo principal de consulta del paciente…"></textarea>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Objetivo terapéutico</label>
+                  <textarea id="objetivo" placeholder="Meta central o enfoque del trabajo terapéutico…"></textarea>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Observaciones clínicas internas</label>
+                  <textarea id="observaciones" placeholder="Notas privadas, pruebas aplicadas, acuerdos, próximos pasos…"></textarea>
+                </div>
+
+                <div class="form-section-title">Primera cita y pago</div>
+                <div class="grid-3">
+                  <div class="form-group">
+                    <label class="form-label">Próxima cita</label>
+                    <input id="proximaCita" type="date">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Hora</label>
+                    <input id="horaCita" type="time">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Modalidad</label>
+                    <select id="modalidad"><option>Presencial</option><option>Virtual</option><option>Híbrida</option></select>
+                  </div>
+                </div>
+                <div class="grid-2">
+                  <div class="form-group">
+                    <label class="form-label">Tarifa inicial S/</label>
+                    <input id="tarifa" type="number" min="0" step="0.01" placeholder="80.00">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Estado de pago</label>
+                    <select id="pago"><option>Pagado</option><option>Pendiente</option><option>Exonerado</option></select>
+                  </div>
+                </div>
+
+                <div style="display:flex;gap:10px;margin-top:4px">
+                  <button class="btn btn-primary" id="saveButton" type="submit" style="flex:1">Guardar paciente</button>
+                  <button class="btn btn-secondary" type="button" onclick="clearForm()">Cancelar</button>
+                </div>
+              </form>
+            </div>
+          </section>
+
+          <!-- SIDEBAR RIGHT -->
+          <aside style="display:flex;flex-direction:column;gap:14px">
+            <!-- AGENDA -->
+            <section id="agenda" class="card section">
+              <div class="card-header">
+                <h3>Próximas citas</h3>
+                <span class="meta" id="nextCount">0 programadas</span>
+              </div>
+              <div class="card-body" style="padding-top:12px">
+                <div id="appointments"></div>
+                <div id="emptyAppointments" class="empty-state hidden" style="padding:20px 0">
+                  <div class="empty-icon">📅</div>
+                  <p>Sin citas próximas.</p>
+                </div>
+              </div>
+            </section>
+
+            <!-- ALERTAS -->
+            <section id="alertas" class="card section">
+              <div class="card-header">
+                <h3>Alertas clínicas</h3>
+                <span class="meta">Seguimiento</span>
+              </div>
+              <div class="card-body" style="padding-top:12px">
+                <div id="alerts"></div>
+              </div>
+            </section>
+
+            <!-- ANALÍTICA -->
+            <section id="analitica" class="card section">
+              <div class="card-header">
+                <h3>Distribución</h3>
+                <span class="meta">Analítica</span>
+              </div>
+              <div class="card-body">
+                <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Por programa</div>
+                <div id="programChart" class="chart-row"></div>
+                <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:16px 0 10px">Por nivel de riesgo</div>
+                <div id="riskChart" class="chart-row"></div>
+              </div>
+            </section>
+          </aside>
+        </div>
+
+        <!-- TABLE SECTION -->
+        <section id="pacientes" class="card section">
+          <div class="card-header">
+            <h3>Pacientes y expedientes</h3>
+            <span class="meta" id="visibleCount">0 visibles</span>
+          </div>
+          <div class="card-body" style="padding-bottom:0">
+            <div class="filters print-hide">
+              <div class="form-group">
+                <label class="form-label">Buscar</label>
+                <div class="search-wrap">
+                  <span class="search-icon">🔍</span>
+                  <input id="search" type="search" placeholder="Nombre, DNI, teléfono, programa…">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Programa</label>
+                <select id="filterProgram"><option value="">Todos</option></select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Estado</label>
+                <select id="filterStatus"><option value="">Todos</option><option>Activo</option><option>En pausa</option><option>Cerrado</option></select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Riesgo</label>
+                <select id="filterRisk"><option value="">Todos</option><option>Bajo</option><option>Medio</option><option>Alto</option></select>
               </div>
             </div>
-            <div class="patient-date">${formatDate(p.fecha)}</div>
           </div>
-
-          <div class="data-line">
-            <b>DNI</b>
-            <span>${escapeHTML(p.dni)}</span>
-          </div>
-
-          <div class="data-line">
-            <b>Motivo</b>
-            <span>${escapeHTML(p.motivo)}</span>
-          </div>
-
-          ${p.observaciones ? `
-            <div class="data-line">
-              <b>Observaciones</b>
-              <span>${escapeHTML(p.observaciones)}</span>
+          <div class="table-wrap" style="margin:0 1px 1px;border-top:1px solid var(--border);border-radius:0 0 var(--radius) var(--radius)">
+            <table>
+              <thead>
+                <tr>
+                  <th>Paciente</th>
+                  <th>Programa</th>
+                  <th>Riesgo</th>
+                  <th>Estado</th>
+                  <th>Próxima cita</th>
+                  <th>Sesiones</th>
+                  <th>Pagos</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="patientTable"></tbody>
+            </table>
+            <div id="emptyState" class="empty-state hidden" style="padding:40px">
+              <div class="empty-icon">🗂</div>
+              <p>Aún no hay pacientes registrados. Comienza agregando uno arriba.</p>
             </div>
-          ` : ""}
-
-          <div class="patient-actions">
-            <button class="btn-soft" onclick="editPatient('${p.id}')">Editar</button>
-            <button class="btn-danger" onclick="deletePatient('${p.id}')">Borrar</button>
           </div>
-        `;
-        container.appendChild(card);
-      });
+        </section>
 
-      empty.classList.toggle("hidden", list.length > 0);
-      document.getElementById("visibleCount").textContent = list.length + " visibles";
+        <!-- RESPALDO -->
+        <section id="respaldo" class="card section print-hide">
+          <div class="card-header">
+            <h3>Herramientas y respaldo</h3>
+            <span class="meta">Almacenamiento local</span>
+          </div>
+          <div class="card-body">
+            <input class="hidden" id="importFile" type="file" accept="application/json,.json">
+            <div class="tools-grid">
+              <button class="tool-btn success" onclick="exportJSON()">
+                <span class="tool-icon">💾</span>
+                Exportar JSON
+                <span style="font-size:11px;color:var(--muted)">Respaldo completo</span>
+              </button>
+              <button class="tool-btn" onclick="document.getElementById('importFile').click()">
+                <span class="tool-icon">📂</span>
+                Restaurar JSON
+                <span style="font-size:11px;color:var(--muted)">Importar respaldo</span>
+              </button>
+              <button class="tool-btn" onclick="exportCSV()">
+                <span class="tool-icon">📊</span>
+                Exportar CSV
+                <span style="font-size:11px;color:var(--muted)">Para Excel</span>
+              </button>
+              <button class="tool-btn" onclick="window.print()">
+                <span class="tool-icon">🖨</span>
+                Imprimir vista
+                <span style="font-size:11px;color:var(--muted)">Resumen impreso</span>
+              </button>
+              <button class="tool-btn" onclick="seedDemo()">
+                <span class="tool-icon">🧪</span>
+                Cargar demo
+                <span style="font-size:11px;color:var(--muted)">Datos de prueba</span>
+              </button>
+              <button class="tool-btn danger" onclick="deleteAll()">
+                <span class="tool-icon">🗑</span>
+                Borrar todo
+                <span style="font-size:11px;color:var(--red);opacity:.7">Acción irreversible</span>
+              </button>
+            </div>
+          </div>
+        </section>
 
-      updateStats();
-      renderCharts();
+      </div><!-- /content -->
+    </main>
+  </div>
+
+  <!-- PATIENT MODAL -->
+  <div id="patientModal" class="modal-backdrop" onclick="closeModal(event)">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal-header">
+        <div style="flex:1;min-width:0">
+          <div class="patient-name" id="modalName">Paciente</div>
+          <div class="patient-sub" id="modalSub">Expediente clínico</div>
+          <div class="patient-badges" id="modalBadges"></div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:flex-start">
+          <button class="btn btn-secondary btn-sm" onclick="printPatient()">🖨 Imprimir</button>
+          <button class="close-btn" type="button" onclick="hidePatientModal()">✕</button>
+        </div>
+      </div>
+      <div class="modal-tabs">
+        <button class="tab-btn active" type="button" onclick="showTab('datos')">📋 Datos</button>
+        <button class="tab-btn" type="button" onclick="showTab('sesiones')">🧠 Sesiones</button>
+        <button class="tab-btn" type="button" onclick="showTab('citas')">📅 Citas</button>
+        <button class="tab-btn" type="button" onclick="showTab('pagos')">💳 Pagos</button>
+        <button class="tab-btn" type="button" onclick="showTab('notas')">📝 Notas</button>
+      </div>
+      <div id="modalBody" class="modal-body"></div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"><span class="toast-icon">✓</span><span id="toastMsg"></span></div>
+
+  <script>
+    /* ─── STORAGE ──────────────────────────────── */
+    const DB_NAME="ClinicoPsiDB",DB_VERSION=2,STORE="state",DATA_KEY="patients",LS_KEY="dashboard_psicologo_v3";
+    let db=null,patients=[],storageMode="memory",currentPatientId=null,activeTab="datos";
+    const form=document.getElementById("patientForm");
+    const search=gid("search"),filterProgram=gid("filterProgram"),filterStatus=gid("filterStatus"),filterRisk=gid("filterRisk");
+    const fields={id:gid("patientId"),nombre:gid("nombre"),dni:gid("dni"),telefono:gid("telefono"),edad:gid("edad"),fecha:gid("fecha"),estado:gid("estado"),programa:gid("programa"),categoria:gid("categoria"),riesgo:gid("riesgo"),proximaCita:gid("proximaCita"),horaCita:gid("horaCita"),modalidad:gid("modalidad"),tarifa:gid("tarifa"),pago:gid("pago"),responsable:gid("responsable"),motivo:gid("motivo"),objetivo:gid("objetivo"),observaciones:gid("observaciones")};
+    fields.fecha.valueAsDate=new Date();
+    boot();
+    function gid(id){return document.getElementById(id)}
+    async function boot(){
+      updateHeroDate();
+      await initStorage();
+      patients=normalizePatients(await loadPatients());
+      populateFilterPrograms(); render(); await saveNow();
+    }
+    function updateHeroDate(){
+      const now=new Date();
+      const day=now.toLocaleDateString('es-PE',{weekday:'long',day:'numeric',month:'long'});
+      const cap=day.charAt(0).toUpperCase()+day.slice(1);
+      gid('heroDate').innerHTML=`<strong>${now.toLocaleTimeString('es-PE',{hour:'2-digit',minute:'2-digit'})}</strong>${cap}`;
+      gid('topbarDate').textContent=cap;
+      setTimeout(updateHeroDate,30000);
+    }
+    function populateFilterPrograms(){
+      const progs=[...new Set([...Array.from(fields.programa.options).map(o=>o.value).filter(Boolean),...patients.map(p=>p.programa).filter(Boolean)])].sort();
+      filterProgram.innerHTML='<option value="">Todos los programas</option>'+progs.map(p=>`<option>${escapeHTML(p)}</option>`).join('');
+    }
+    async function initStorage(){
+      try{db=await openDB(); storageMode="indexeddb"; setStatus("Guardado automático")}
+      catch(e){try{testLS(); storageMode="localstorage"; setStatus("Modo localStorage")}catch(_){storageMode="memory"; setStatus("Sin persistencia")}}
+    }
+    function openDB(){return new Promise((res,rej)=>{if(!("indexedDB" in window))return rej(new Error("No IDB")); const r=indexedDB.open(DB_NAME,DB_VERSION); r.onupgradeneeded=e=>{if(!e.target.result.objectStoreNames.contains(STORE))e.target.result.createObjectStore(STORE)}; r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); r.onblocked=()=>rej(new Error("Bloqueado"))})}
+    function idbGet(k){return new Promise((res,rej)=>{const tx=db.transaction(STORE,"readonly"); const r=tx.objectStore(STORE).get(k); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error)})}
+    function idbSet(k,v){return new Promise((res,rej)=>{const tx=db.transaction(STORE,"readwrite"); const r=tx.objectStore(STORE).put(v,k); r.onsuccess=()=>res(true); r.onerror=()=>rej(r.error)})}
+    function testLS(){const k=LS_KEY+"_t"; localStorage.setItem(k,"1"); localStorage.removeItem(k)}
+    async function loadPatients(){
+      let ls=[]; try{const r=localStorage.getItem(LS_KEY); ls=r?JSON.parse(r):[]}catch(_){}
+      if(storageMode==="indexeddb"&&db){try{const r=await idbGet(DATA_KEY); if(Array.isArray(r))return r}catch(_){}}
+      return Array.isArray(ls)?ls:[];
+    }
+    async function saveNow(){
+      const safe=normalizePatients(patients);
+      if(storageMode==="indexeddb"&&db){try{await idbSet(DATA_KEY,safe)}catch(_){setStatus("Error al guardar")}}
+      try{localStorage.setItem(LS_KEY,JSON.stringify(safe))}catch(_){}
+      updateSavedTime();
+    }
+    function setStatus(t){gid("storageStatus").textContent=t}
+    function updateSavedTime(){const t=new Date().toLocaleTimeString('es-PE',{hour:'2-digit',minute:'2-digit'}); gid("storageStatus").textContent="Guardado "+t}
+    function normalizePatients(items){
+      return (Array.isArray(items)?items:[]).map(p=>({
+        id:p.id||makeId(),nombre:p.nombre||"",dni:p.dni||"",telefono:p.telefono||"",
+        edad:p.edad||"",fecha:p.fecha||todayISO(),estado:p.estado||"Activo",
+        programa:p.programa||"",categoria:p.categoria||"",riesgo:p.riesgo||"Bajo",
+        modalidad:p.modalidad||"Presencial",responsable:p.responsable||"",
+        motivo:p.motivo||"",objetivo:p.objetivo||"",observaciones:p.observaciones||"",
+        actualizado:p.actualizado||new Date().toISOString(),
+        sessions:Array.isArray(p.sessions)?p.sessions:(p.motivo?[{id:makeId(),fecha:p.fecha||todayISO(),tipo:p.categoria||"Sesión",nro:1,resumen:p.motivo||"",tareas:"",riesgo:p.riesgo||"Bajo"}]:[]),
+        appointments:Array.isArray(p.appointments)?p.appointments:(p.proximaCita?[{id:makeId(),fecha:p.proximaCita,hora:p.horaCita||"",motivo:"Primera cita",estado:"Programada",modalidad:p.modalidad||"Presencial"}]:[]),
+        payments:Array.isArray(p.payments)?p.payments:((p.tarifa||p.pago)?[{id:makeId(),fecha:p.fecha||todayISO(),concepto:"Sesión inicial",monto:Number(p.tarifa||0),estado:p.pago||"Pendiente"}]:[]),
+        docs:Array.isArray(p.docs)?p.docs:[],notes:Array.isArray(p.notes)?p.notes:[]
+      }));
     }
 
-    function updateStats() {
-      const now = new Date();
-      const currentMonth = now.getMonth();
-      const currentYear = now.getFullYear();
-
-      const thisMonth = patients.filter(p => {
-        const d = new Date(p.fecha + "T00:00:00");
-        return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
-      }).length;
-
-      document.getElementById("topTotal").textContent = patients.length;
-      document.getElementById("totalPacientes").textContent = patients.length;
-      document.getElementById("pacientesMes").textContent = thisMonth;
-      document.getElementById("totalProgramas").textContent = new Set(patients.map(p => p.programa)).size;
-      document.getElementById("totalCategorias").textContent = new Set(patients.map(p => p.categoria)).size;
-    }
-
-    function countBy(key) {
-      return patients.reduce((acc, p) => {
-        acc[p[key]] = (acc[p[key]] || 0) + 1;
-        return acc;
-      }, {});
-    }
-
-    function renderCharts() {
-      drawChart("programChart", countBy("programa"));
-      drawChart("categoryChart", countBy("categoria"));
-    }
-
-    function drawChart(id, data) {
-      const container = document.getElementById(id);
-      const entries = Object.entries(data).sort((a, b) => b[1] - a[1]);
-      const max = Math.max(...entries.map(item => item[1]), 1);
-
-      if (!entries.length) {
-        container.innerHTML = `<div class="empty" style="padding:10px;">Sin datos.</div>`;
-        return;
+    /* ─── FORM ─────────────────────────────────── */
+    form.addEventListener("submit",async e=>{
+      e.preventDefault();
+      const patient=readForm();
+      if(!patient.nombre||!patient.dni||!patient.fecha||!patient.programa||!patient.categoria||!patient.motivo){alert("Completa los campos obligatorios.");return}
+      const i=patients.findIndex(p=>p.id===patient.id);
+      if(i>=0){
+        const old=patients[i];
+        patients[i]={...old,...patient,sessions:old.sessions||[],appointments:old.appointments||[],payments:old.payments||[],docs:old.docs||[],notes:old.notes||[],actualizado:new Date().toISOString()};
+        showToast("Ficha base actualizada correctamente.");
+      }else{
+        if(patient.proximaCita)patient.appointments.push({id:makeId(),fecha:patient.proximaCita,hora:patient.horaCita,motivo:"Primera cita registrada",estado:"Programada",modalidad:patient.modalidad||"Presencial"});
+        if(Number(patient.tarifa||0)>0||patient.pago){patient.payments.push({id:makeId(),fecha:patient.fecha,concepto:"Sesión inicial",monto:Number(patient.tarifa||0),estado:patient.pago||"Pendiente"});}
+        patient.sessions.push({id:makeId(),fecha:patient.fecha,tipo:patient.categoria,nro:1,resumen:patient.motivo,tareas:patient.objetivo,riesgo:patient.riesgo});
+        patients.unshift(patient);
+        showToast("Paciente creado con expediente completo.");
       }
+      await saveNow(); clearForm(); populateFilterPrograms(); render();
+    });
+    function readForm(){
+      return {id:fields.id.value||makeId(),nombre:fields.nombre.value.trim(),dni:fields.dni.value.trim(),telefono:fields.telefono.value.trim(),edad:fields.edad.value,fecha:fields.fecha.value,estado:fields.estado.value,programa:fields.programa.value,categoria:fields.categoria.value,riesgo:fields.riesgo.value,modalidad:fields.modalidad?.value||"Presencial",proximaCita:fields.proximaCita.value,horaCita:fields.horaCita.value,tarifa:Number(fields.tarifa.value||0),pago:fields.pago.value,responsable:fields.responsable.value.trim(),motivo:fields.motivo.value.trim(),objetivo:fields.objetivo.value.trim(),observaciones:fields.observaciones.value.trim(),sessions:[],appointments:[],payments:[],docs:[],notes:[],actualizado:new Date().toISOString()};
+    }
+    function clearForm(){form.reset();fields.id.value="";fields.fecha.valueAsDate=new Date();fields.estado.value="Activo";fields.riesgo.value="Bajo";fields.pago.value="Pagado";if(fields.modalidad)fields.modalidad.value="Presencial";gid("formTitle").textContent="Nuevo paciente";gid("formMode").textContent="Registro base · Complete todos los campos requeridos";gid("saveButton").textContent="Guardar paciente"}
+    function editPatient(id){const p=patients.find(x=>x.id===id);if(!p)return;Object.entries(fields).forEach(([k,el])=>{if(el&&k in p)el.value=p[k]??""});const next=nextAppointment(p);fields.proximaCita.value=next?next.fecha:"";fields.horaCita.value=next?next.hora:"";if(fields.modalidad)fields.modalidad.value=next?.modalidad||p.modalidad||"Presencial";const pay=latestPayment(p);fields.tarifa.value=pay?pay.monto:"";fields.pago.value=pay?pay.estado:"Pagado";gid("formTitle").textContent="Editar ficha base";gid("formMode").textContent="Edición de expediente existente";gid("saveButton").textContent="Actualizar ficha";scrollToSection('registro')}
+    async function deletePatient(id){const p=patients.find(x=>x.id===id);if(!p)return;if(!confirm("¿Borrar el expediente completo de "+p.nombre+"?\nEsta acción no se puede deshacer."))return;patients=patients.filter(x=>x.id!==id);await saveNow();render();showToast("Expediente eliminado.")}
 
-      container.innerHTML = entries.map(([name, count]) => {
-        const width = Math.max(8, Math.round((count / max) * 100));
-        return `
-          <div class="bar">
-            <div class="bar-name" title="${escapeHTML(name)}">${escapeHTML(name)}</div>
-            <div class="track"><div class="fill" style="width:${width}%"></div></div>
-            <div class="bar-count">${count}</div>
+    /* ─── FILTER & RENDER ──────────────────────── */
+    search.addEventListener("input",render); filterProgram.addEventListener("change",render); filterStatus.addEventListener("change",render); filterRisk.addEventListener("change",render);
+    gid("importFile").addEventListener("change",importJSON);
+    document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden")saveNow()});
+    window.addEventListener("pagehide",saveNow);
+    function filteredPatients(){const q=search.value.toLowerCase().trim(),program=filterProgram.value,status=filterStatus.value,risk=filterRisk.value;return patients.filter(p=>{const text=[p.nombre,p.dni,p.telefono,p.programa,p.categoria,p.riesgo,p.estado,p.motivo,p.objetivo,p.observaciones,p.responsable,...(p.sessions||[]).map(s=>s.resumen),...(p.notes||[]).map(n=>n.texto)].join(" ").toLowerCase();return(!q||text.includes(q))&&(!program||p.programa===program)&&(!status||p.estado===status)&&(!risk||p.riesgo===risk)})}
+    function render(){const list=filteredPatients();renderTable(list);renderStats();renderAppointments();renderAlerts();renderCharts();gid("visibleCount").textContent=list.length+" visibles";gid("navVisible").textContent=list.length;gid("navTotal").textContent=patients.length}
+
+    function renderTable(list){
+      const tbody=gid("patientTable"); tbody.innerHTML="";
+      list.forEach(p=>{
+        const next=nextAppointment(p);
+        const pending=(p.payments||[]).filter(x=>x.estado==="Pendiente");
+        const statusClass="status-"+p.estado.replace(/ /g,"-");
+        const tr=document.createElement("tr");
+        tr.innerHTML=`
+          <td data-label="Paciente" class="name-cell"><strong>${escapeHTML(p.nombre)}</strong><span>DNI ${escapeHTML(p.dni)}${p.telefono?" · "+escapeHTML(p.telefono):""}</span></td>
+          <td data-label="Programa"><span class="badge badge-blue">${escapeHTML(p.programa)}</span></td>
+          <td data-label="Riesgo"><span class="badge risk-${escapeHTML(p.riesgo)}">${escapeHTML(p.riesgo)}</span></td>
+          <td data-label="Estado"><span class="badge ${statusClass}">${escapeHTML(p.estado)}</span></td>
+          <td data-label="Próxima cita" style="font-size:12px">${next?formatDate(next.fecha)+(next.hora?" · "+escapeHTML(next.hora):"")+"<br><span style='color:var(--muted);font-size:11px'>"+escapeHTML(next.modalidad||"Presencial")+"</span>":"<span style='color:var(--muted)'>Sin fecha</span>"}</td>
+          <td data-label="Sesiones" style="font-weight:700">${(p.sessions||[]).length}</td>
+          <td data-label="Pagos">${pending.length?`<span class="badge badge-orange">${pending.length} pendiente${pending.length>1?"s":""}</span>`:`<span class="badge badge-green">Al día</span>`}</td>
+          <td data-label="Acciones"><div class="row-actions">
+            <button class="btn btn-primary btn-sm" onclick="showPatient('${p.id}')">Expediente</button>
+            <button class="btn btn-secondary btn-sm" onclick="editPatient('${p.id}')">Editar</button>
+            <button class="btn btn-danger btn-sm" onclick="deletePatient('${p.id}')">Borrar</button>
+          </div></td>`;
+        tbody.appendChild(tr);
+      });
+      gid("emptyState").classList.toggle("hidden",list.length>0);
+    }
+
+    function renderStats(){
+      const today=todayISO();
+      const active=patients.filter(p=>p.estado==="Activo").length;
+      const high=patients.filter(p=>p.riesgo==="Alto"&&p.estado!=="Cerrado").length;
+      const todayCitas=patients.flatMap(p=>(p.appointments||[]).map(a=>({...a,p}))).filter(x=>x.fecha===today&&x.estado!=="Cancelada").length;
+      const futureCitas=patients.flatMap(p=>(p.appointments||[])).filter(a=>a.fecha>=today&&a.estado!=="Cancelada").length;
+      const pending=patients.flatMap(p=>(p.payments||[])).filter(x=>x.estado==="Pendiente");
+      const totalSessions=patients.reduce((s,p)=>s+(p.sessions||[]).length,0);
+      const pendingAmount=pending.reduce((s,p)=>s+Number(p.monto||0),0);
+      gid("heroActive").textContent=active;gid("heroToday").textContent=todayCitas;gid("heroPendingPay").textContent=pending.length;gid("heroHighRisk").textContent=high;
+      gid("totalPacientes").textContent=patients.length;gid("totalSesiones").textContent=totalSessions;gid("totalCitas").textContent=futureCitas;gid("saldoPendiente").textContent=money(pendingAmount);
+      gid("navAlerts").textContent=(high>0?high:0)+(patients.flatMap(p=>(p.appointments||[]).map(a=>({...a,p}))).filter(x=>x.fecha&&x.fecha<today&&x.estado==="Programada"&&x.p.estado!=="Cerrado").length)+(pending.length>0?1:0)||"";
+    }
+
+    function renderAppointments(){
+      const today=todayISO();
+      const all=patients.flatMap(p=>(p.appointments||[]).map(a=>({...a,patient:p}))).filter(x=>x.fecha&&x.fecha>=today&&x.estado!=="Cancelada"&&x.patient.estado!=="Cerrado").sort((a,b)=>(a.fecha+(a.hora||"")).localeCompare(b.fecha+(b.hora||""))).slice(0,8);
+      gid("appointments").innerHTML=all.map(a=>{
+        const d=new Date(a.fecha+"T00:00:00"),day=String(d.getDate()).padStart(2,"0"),mon=d.toLocaleDateString("es-PE",{month:"short"}).replace(".","");
+        return `<div class="appointment-item">
+          <div class="date-box">${day}<small>${mon}</small></div>
+          <div class="appointment-info">
+            <strong>${escapeHTML(a.patient.nombre)}</strong>
+            <span>${escapeHTML(a.motivo||a.patient.programa)}${a.hora?" · "+escapeHTML(a.hora):""}${a.modalidad?" · "+escapeHTML(a.modalidad):""}</span>
           </div>
-        `;
+          <span class="badge risk-${escapeHTML(a.patient.riesgo)}">${escapeHTML(a.patient.riesgo)}</span>
+        </div>`;
+      }).join("");
+      gid("emptyAppointments").classList.toggle("hidden",all.length>0);
+      gid("nextCount").textContent=all.length+" programadas";
+      gid("navAgenda").textContent=all.length||"";
+    }
+
+    function renderAlerts(){
+      const today=todayISO();
+      const high=patients.filter(p=>p.riesgo==="Alto"&&p.estado!=="Cerrado").length;
+      const overdue=patients.flatMap(p=>(p.appointments||[]).map(a=>({...a,p}))).filter(x=>x.fecha&&x.fecha<today&&x.estado==="Programada"&&x.p.estado!=="Cerrado").length;
+      const pending=patients.flatMap(p=>(p.payments||[])).filter(x=>x.estado==="Pendiente").length;
+      const alerts=[];
+      if(high)alerts.push({type:"red",icon:"⚠",title:`${high} expediente${high>1?"s":""} con riesgo alto`,body:"Requieren revisión prioritaria en la próxima sesión."});
+      if(overdue)alerts.push({type:"orange",icon:"C",title:`${overdue} cita${overdue>1?"s":""} vencida${overdue>1?"s":""}`,body:"Citas que siguen como programadas sin haber sido realizadas."});
+      if(pending)alerts.push({type:"blue",icon:"P",title:`${pending} pago${pending>1?"s":""} pendiente${pending>1?"s":""}`,body:"Existen sesiones sin confirmar cobro."});
+      if(!alerts.length)alerts.push({type:"ok",icon:"✓",title:"Sin alertas activas",body:"El consultorio está al día. No hay alertas críticas."});
+      gid("alerts").innerHTML=alerts.map(a=>`<div class="alert-item alert-${a.type}"><div class="alert-dot">${a.icon}</div><div class="alert-content"><strong>${escapeHTML(a.title)}</strong><p>${escapeHTML(a.body)}</p></div></div>`).join("");
+    }
+
+    function renderCharts(){
+      drawChart("programChart",countBy("programa"));
+      drawChart("riskChart",countBy("riesgo"),true);
+    }
+    function countBy(key){return patients.reduce((acc,p)=>{const label=p[key]||"Sin dato";acc[label]=(acc[label]||0)+1;return acc},{})}
+    function drawChart(id,data,colorRisk=false){
+       const entries=Object.entries(data).sort((a,b)=>b[1]-a[1]),max=Math.max(...entries.map(e=>e[1]),1);
+      gid(id).innerHTML=entries.length?entries.map(([name,count])=>{let cls=colorRisk?(name==="Alto"?"red":name==="Medio"?"orange":"green"):"";return `<div class="chart-bar"><div class="chart-name" title="${escapeHTML(name)}">${escapeHTML(name)}</div><div class="chart-track"><div class="chart-fill ${cls}" style="width:${Math.max(6,Math.round(count/max*100))}%"></div></div><div class="chart-count">${count}</div></div>`}).join(""):`<div style="padding:10px;font-size:12px;color:var(--muted)">Sin datos.</div>`;
+    }
+
+    /* --- MODAL --- */
+    function showPatient(id){currentPatientId=id;activeTab="datos";const p=getCurrent();if(!p)return;gid("modalName").textContent=p.nombre;gid("modalSub").textContent=`${p.programa} · ${p.categoria} · Expediente individual`;gid("modalBadges").innerHTML=`<span class="badge risk-${p.riesgo}">${p.riesgo}</span><span class="badge badge-gray">${p.estado}</span><span class="badge badge-gray">${p.modalidad||"Presencial"}</span>`;gid("patientModal").classList.add("open");renderPatientModal()}
+    function renderPatientModal(){const p=getCurrent();if(!p)return;gid("modalBody").innerHTML=`<div id="tab-datos" class="tab-panel ${activeTab==='datos'?'active':''}">${renderDatos(p)}</div><div id="tab-sesiones" class="tab-panel ${activeTab==='sesiones'?'active':''}">${renderSesiones(p)}</div><div id="tab-citas" class="tab-panel ${activeTab==='citas'?'active':''}">${renderCitas(p)}</div><div id="tab-pagos" class="tab-panel ${activeTab==='pagos'?'active':''}">${renderPagos(p)}</div><div id="tab-notas" class="tab-panel ${activeTab==='notas'?'active':''}">${renderNotas(p)}</div>`;document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));const idx={datos:0,sesiones:1,citas:2,pagos:3,notas:4}[activeTab]||0;document.querySelectorAll('.tab-btn')[idx].classList.add('active')}
+    function showTab(tab){activeTab=tab;renderPatientModal()}
+    function getCurrent(){return patients.find(p=>p.id===currentPatientId)}
+    function hidePatientModal(){gid("patientModal").classList.remove("open")}
+    function closeModal(e){if(e.target.id==="patientModal")hidePatientModal()}
+
+    function renderDatos(p){
+      const next=nextAppointment(p),pending=(p.payments||[]).filter(x=>x.estado==="Pendiente").reduce((s,x)=>s+Number(x.monto||0),0);
+      return `<div class="patient-layout">
+        <div>
+          <div class="detail-grid">
+            ${detail("Documento",p.dni)}${detail("Teléfono",p.telefono||"No registrado")}${detail("Edad",p.edad||"No registrada")}
+            ${detail("Fecha de ingreso",formatDate(p.fecha))}${detail("Estado",p.estado)}${detail("Riesgo actual",p.riesgo)}
+            ${detail("Programa",p.programa)}${detail("Categoría",p.categoria)}${detail("Modalidad",p.modalidad||"Presencial")}
+            ${detail("Próxima cita",next?formatDate(next.fecha)+(next.hora?" · "+next.hora:""):"Sin cita próxima")}
+            ${detail("Responsable",p.responsable||"No registrado")}
+          </div>
+          <div class="detail-grid" style="grid-template-columns:1fr;margin-top:4px">
+            ${detail("Motivo de consulta",p.motivo||"Sin registro")}
+            ${detail("Objetivo terapéutico",p.objetivo||"Sin registro")}
+            ${detail("Observaciones internas",p.observaciones||"Sin registro")}
+          </div>
+          <div style="display:flex;gap:10px;margin-top:14px">
+            <button class="btn btn-primary btn-sm" onclick="hidePatientModal();editPatient('${p.id}')">Editar ficha</button>
+            <button class="btn btn-secondary btn-sm" onclick="printPatient()">Imprimir expediente</button>
+          </div>
+        </div>
+        <aside class="side-summary">
+          <div class="summary-stat"><strong>${(p.sessions||[]).length}</strong><span>Sesiones</span></div>
+          <div class="summary-stat"><strong>${(p.appointments||[]).length}</strong><span>Citas totales</span></div>
+          <div class="summary-stat"><strong>${money(pending)}</strong><span>Saldo pendiente</span></div>
+          <div class="summary-stat"><strong>${(p.notes||[]).length+(p.docs||[]).length}</strong><span>Notas y docs</span></div>
+        </aside>
+      </div>`;
+    }
+
+    function renderSesiones(p){const nextN=(p.sessions||[]).length+1;return `<div class="subform"><div class="grid-3"><div class="form-group"><label class="form-label">Fecha</label><input id="s_fecha" type="date" value="${todayISO()}"></div><div class="form-group"><label class="form-label">Tipo</label><select id="s_tipo"><option>Sesión individual</option><option>Evaluación</option><option>Seguimiento</option><option>Intervención familiar</option><option>Cierre</option></select></div><div class="form-group"><label class="form-label">Riesgo</label><select id="s_riesgo"><option ${p.riesgo==="Bajo"?"selected":""}>Bajo</option><option ${p.riesgo==="Medio"?"selected":""}>Medio</option><option ${p.riesgo==="Alto"?"selected":""}>Alto</option></select></div></div><div class="form-group"><label class="form-label">Resumen de sesión</label><textarea id="s_resumen" placeholder="Evolución, técnicas aplicadas, respuesta del paciente…"></textarea></div><div class="form-group"><label class="form-label">Tareas / acuerdos</label><textarea id="s_tareas" placeholder="Tareas para casa, acuerdos, pruebas pendientes…"></textarea></div><button class="btn btn-primary" type="button" onclick="addSession(${nextN})">+ Agregar sesión</button></div><div class="records">${recordsOrEmpty(p.sessions,"sesion")}</div>`}
+
+    function renderCitas(p){return `<div class="subform"><div class="grid-3"><div class="form-group"><label class="form-label">Fecha</label><input id="c_fecha" type="date" value="${todayISO(1)}"></div><div class="form-group"><label class="form-label">Hora</label><input id="c_hora" type="time"></div><div class="form-group"><label class="form-label">Modalidad</label><select id="c_modalidad"><option>Presencial</option><option>Virtual</option><option>Híbrida</option></select></div></div><div class="grid-2"><div class="form-group"><label class="form-label">Motivo</label><input id="c_motivo" placeholder="Seguimiento, evaluación…"></div><div class="form-group"><label class="form-label">Estado</label><select id="c_estado"><option>Programada</option><option>Realizada</option><option>Cancelada</option><option>No asistió</option></select></div></div><button class="btn btn-primary" type="button" onclick="addAppointment()">+ Agregar cita</button></div><div class="records">${recordsOrEmpty(p.appointments,"cita")}</div>`}
+
+    function renderPagos(p){const total=(p.payments||[]).reduce((s,x)=>s+Number(x.monto||0),0),pendingAmt=(p.payments||[]).filter(x=>x.estado==="Pendiente").reduce((s,x)=>s+Number(x.monto||0),0);return `<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px"><div class="summary-stat" style="padding:12px"><strong>${money(total)}</strong><span>Total facturado</span></div><div class="summary-stat" style="padding:12px"><strong style="color:var(--green)">${money(total-pendingAmt)}</strong><span>Cobrado</span></div><div class="summary-stat" style="padding:12px"><strong style="color:var(--red)">${money(pendingAmt)}</strong><span>Pendiente</span></div></div><div class="subform"><div class="grid-3"><div class="form-group"><label class="form-label">Fecha</label><input id="p_fecha" type="date" value="${todayISO()}"></div><div class="form-group"><label class="form-label">Monto S/</label><input id="p_monto" type="number" min="0" step="0.01" placeholder="80"></div><div class="form-group"><label class="form-label">Estado</label><select id="p_estado"><option>Pagado</option><option>Pendiente</option><option>Exonerado</option></select></div></div><div class="form-group"><label class="form-label">Concepto</label><input id="p_concepto" placeholder="Sesión, evaluación, paquete mensual…"></div><button class="btn btn-primary" type="button" onclick="addPayment()">+ Agregar pago</button></div><div class="records">${recordsOrEmpty(p.payments,"pago")}</div>`}
+
+    function renderNotas(p){return `<div class="subform"><div class="grid-2"><div class="form-group"><label class="form-label">Título</label><input id="n_titulo" placeholder="Nota clínica, documento, prueba…"></div><div class="form-group"><label class="form-label">Tipo</label><select id="n_tipo"><option>Nota interna</option><option>Documento</option><option>Prueba aplicada</option><option>Derivación</option><option>Acuerdo</option></select></div></div><div class="form-group"><label class="form-label">Contenido</label><textarea id="n_texto" placeholder="Contenido de la nota o referencia…"></textarea></div><button class="btn btn-primary" type="button" onclick="addNoteOrDoc()">+ Agregar nota</button></div><div class="records">${recordsOrEmpty([...(p.notes||[]),...(p.docs||[])].sort((a,b)=>(b.fecha||"").localeCompare(a.fecha||"")),"nota")}</div>`}
+
+    function recordsOrEmpty(items,type){
+      items=Array.isArray(items)?items:[];
+      if(!items.length)return `<div class="empty-state" style="padding:20px"><p>Sin registros en esta sección.</p></div>`;
+      return items.map(item=>{
+        let title="",sub="",body="",badgeHtml="";
+        if(type==="sesion"){title=`Sesión ${item.nro||""}`;sub=`${formatDate(item.fecha)} · ${item.tipo||""}`;body=`${item.resumen||""}${item.tareas?"\n\nTareas: "+item.tareas:""}`;badgeHtml=`<span class="badge risk-${item.riesgo||"Bajo"}">${item.riesgo||"Bajo"}</span>`;}
+        if(type==="cita"){title=item.motivo||"Cita";sub=`${formatDate(item.fecha)}${item.hora?" · "+item.hora:""}`;badgeHtml=`<span class="badge badge-gray">${item.estado||"Programada"}</span>${item.modalidad?`<span class="badge badge-gray">${item.modalidad}</span>`:""}`;body="";}
+        if(type==="pago"){title=item.concepto||"Pago";sub=`${formatDate(item.fecha)} · ${money(item.monto||0)}`;const pc=item.estado==="Pagado"?"badge-green":item.estado==="Pendiente"?"badge-orange":"badge-gray";badgeHtml=`<span class="badge ${pc}">${item.estado||""}</span>`;body="";}
+        if(type==="nota"){title=item.titulo||item.tipo||"Nota";sub=`${formatDate(item.fecha)} · ${item.tipo||"Nota"}`;body=item.texto||item.detalle||"";}
+        return `<article class="record"><div class="record-head"><div><strong>${escapeHTML(title)}</strong><div style="font-size:12px;color:var(--muted);margin-top:3px">${escapeHTML(sub)}</div></div><div style="display:flex;gap:5px;align-items:center">${badgeHtml}</div></div>${body?`<p>${escapeHTML(body)}</p>`:""}<div class="record-actions"><button class="btn btn-danger btn-xs" type="button" onclick="deleteNested('${type}','${escapeHTML(item.id)}')">Eliminar</button></div></article>`;
       }).join("");
     }
 
-    function exportJSON() {
-      const payload = {
-        app: "Control de Pacientes Psicologia",
-        version: 3,
-        exportedAt: new Date().toISOString(),
-        patients
-      };
+    function detail(label,value){return `<div class="detail-box"><b>${escapeHTML(label)}</b><span>${escapeHTML(value)}</span></div>`}
 
-      downloadFile(
-        JSON.stringify(payload, null, 2),
-        "respaldo_pacientes_" + todayName() + ".json",
-        "application/json;charset=utf-8"
-      );
-    }
+    async function addSession(nro){const p=getCurrent();if(!p)return;const session={id:makeId(),fecha:gid("s_fecha").value||todayISO(),tipo:gid("s_tipo").value,nro:nro,resumen:gid("s_resumen").value.trim(),tareas:gid("s_tareas").value.trim(),riesgo:gid("s_riesgo").value};if(!session.resumen&&!session.tareas){alert("Escribe un resumen o tarea.");return}p.sessions.unshift(session);p.riesgo=session.riesgo;p.actualizado=new Date().toISOString();await saveNow();render();renderPatientModal();showToast("Sesión agregada.")}
+    async function addAppointment(){const p=getCurrent();if(!p)return;const ap={id:makeId(),fecha:gid("c_fecha").value,hora:gid("c_hora").value,motivo:gid("c_motivo").value.trim()||"Cita psicológica",estado:gid("c_estado").value,modalidad:gid("c_modalidad")?.value||"Presencial"};if(!ap.fecha){alert("Selecciona una fecha.");return}p.appointments.unshift(ap);p.actualizado=new Date().toISOString();await saveNow();render();renderPatientModal();showToast("Cita registrada.")}
+    async function addPayment(){const p=getCurrent();if(!p)return;const pay={id:makeId(),fecha:gid("p_fecha").value||todayISO(),concepto:gid("p_concepto").value.trim()||"Pago de sesión",monto:Number(gid("p_monto").value||0),estado:gid("p_estado").value};p.payments.unshift(pay);p.actualizado=new Date().toISOString();await saveNow();render();renderPatientModal();showToast("Pago registrado.")}
+    async function addNoteOrDoc(){const p=getCurrent();if(!p)return;const tipo=gid("n_tipo").value;const item={id:makeId(),fecha:todayISO(),titulo:gid("n_titulo").value.trim()||tipo,tipo:tipo,texto:gid("n_texto").value.trim()};if(!item.texto){alert("Escribe el contenido.");return}if(tipo==="Documento"||tipo==="Prueba aplicada"||tipo==="Derivación")p.docs.unshift(item);else p.notes.unshift(item);p.actualizado=new Date().toISOString();await saveNow();render();renderPatientModal();showToast("Nota agregada.")}
+    async function deleteNested(type,id){const p=getCurrent();if(!p)return;if(!confirm("¿Eliminar este registro?"))return;const map={sesion:"sessions",cita:"appointments",pago:"payments"};if(type==="nota"){p.notes=(p.notes||[]).filter(x=>x.id!==id);p.docs=(p.docs||[]).filter(x=>x.id!==id)}else{const key=map[type];p[key]=(p[key]||[]).filter(x=>x.id!==id)}p.actualizado=new Date().toISOString();await saveNow();render();renderPatientModal();showToast("Registro eliminado.")}
 
-    async function importJSON(event) {
-      const file = event.target.files[0];
-      event.target.value = "";
+    /* --- PRINT --- */
+    function printPatient(){const p=getCurrent();if(!p)return alert("Abre primero un expediente.");const w=window.open("","_blank");if(!w){alert("El navegador bloqueó la ventana. Permite ventanas emergentes.");return}const css=`body{font-family:Arial,sans-serif;color:#111;margin:28px}h1{font-size:22px;margin:0 0 4px}h2{font-size:12px;margin:16px 0 7px;border-bottom:1px solid #e5e7eb;padding-bottom:5px;text-transform:uppercase;letter-spacing:.06em;color:#6b7280}.meta{color:#6b7280;margin-bottom:16px;font-size:12px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.box{border:1px solid #e5e7eb;border-radius:7px;padding:9px}.box b{font-size:10px;text-transform:uppercase;color:#9ca3af;display:block}.box span{font-size:12px;display:block;margin-top:4px}.rec{border:1px solid #e5e7eb;border-radius:7px;padding:9px;margin:6px 0}.rh{display:flex;justify-content:space-between;gap:10px}.rh strong{font-size:12px}.rh span{font-size:11px;color:#6b7280}.rec p{margin:5px 0 0;font-size:11px;color:#374151;white-space:pre-wrap}.empty{color:#9ca3af;font-size:12px}@media print{body{margin:12px}}`;
+    const rs=(type,items)=>{if(!items.length)return`<div class="empty">Sin registros.</div>`;return items.map(i=>{let t="",s="",b="";if(type==="sesion"){t=`Sesión ${i.nro} · ${i.tipo}`;s=`${formatDate(i.fecha)} · Riesgo: ${i.riesgo}`;b=(i.resumen||"")+(i.tareas?"\nTareas: "+i.tareas:"");}if(type==="cita"){t=i.motivo||"Cita";s=`${formatDate(i.fecha)}${i.hora?" · "+i.hora:""} · ${i.estado}${i.modalidad?" · "+i.modalidad:""}`;}if(type==="pago"){t=i.concepto||"Pago";s=`${formatDate(i.fecha)} · S/${i.monto} · ${i.estado}`;}if(type==="nota"){t=i.titulo||i.tipo;s=`${formatDate(i.fecha)} · ${i.tipo}`;b=i.texto||"";}return`<div class="rec"><div class="rh"><strong>${escapeHTML(t)}</strong><span>${escapeHTML(s)}</span></div>${b?`<p>${escapeHTML(b)}</p>`:""}</div>`;}).join("")};
+    w.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Expediente - ${escapeHTML(p.nombre)}</title><style>${css}</style></head><body><h1>${escapeHTML(p.nombre)}</h1><div class="meta">DNI ${escapeHTML(p.dni)}${p.telefono?" · "+escapeHTML(p.telefono):""} · ${escapeHTML(p.programa)} · Riesgo: ${escapeHTML(p.riesgo)}<br>Generado: ${new Date().toLocaleString("es-PE")}</div><div class="grid">${["Documento","Teléfono","Edad","Ingreso","Estado","Riesgo","Programa","Categoría","Modalidad"].map((l,i)=>`<div class="box"><b>${l}</b><span>${escapeHTML([p.dni,p.telefono||"—",p.edad||"—",formatDate(p.fecha),p.estado,p.riesgo,p.programa,p.categoria,p.modalidad||"Presencial"][i])}</span></div>`).join("")}</div><h2>Motivo y objetivo</h2><div class="grid" style="grid-template-columns:1fr"><div class="box"><b>Motivo de consulta</b><span>${escapeHTML(p.motivo||"—")}</span></div><div class="box"><b>Objetivo terapéutico</b><span>${escapeHTML(p.objetivo||"—")}</span></div><div class="box"><b>Observaciones</b><span>${escapeHTML(p.observaciones||"—")}</span></div></div><h2>Sesiones (${(p.sessions||[]).length})</h2>${rs("sesion",p.sessions||[])}<h2>Citas (${(p.appointments||[]).length})</h2>${rs("cita",p.appointments||[])}<h2>Pagos</h2>${rs("pago",p.payments||[])}<h2>Notas</h2>${rs("nota",[...(p.notes||[]),...(p.docs||[])])}</body></html>`);w.document.close();w.focus();setTimeout(()=>w.print(),300);}
 
-      if (!file) return;
+    /* --- TOOLS --- */
+    async function deleteAll(){if(!patients.length)return alert("No hay pacientes.");if(!confirm("¿Borrar todos los expedientes? No puede deshacerse."))return;patients=[];await saveNow();render();showToast("Todos los expedientes eliminados.")}
+    function exportJSON(){downloadFile(JSON.stringify({app:"ControlClinicoPsicologia",version:3,exportedAt:new Date().toISOString(),patients},null,2),"respaldo_"+todayISO()+".json","application/json;charset=utf-8")}
+    async function importJSON(e){const file=e.target.files[0];e.target.value="";if(!file)return;try{const json=JSON.parse(await file.text());const imported=Array.isArray(json)?json:json.patients;if(!Array.isArray(imported))return alert("Formato no válido.");if(!confirm("¿Restaurar respaldo? Se reemplazarán los datos actuales."))return;patients=normalizePatients(imported);await saveNow();populateFilterPrograms();render();showToast("Respaldo restaurado.")}catch(_){alert("Error al leer el JSON.")}}
+    function exportCSV(){if(!patients.length)return alert("No hay pacientes.");const h=["Nombre","DNI","Teléfono","Edad","Ingreso","Estado","Programa","Categoría","Riesgo","Modalidad","Sesiones","Citas","Pagos pendientes","Saldo pendiente","Motivo"];const rows=patients.map(p=>{const pending=(p.payments||[]).filter(x=>x.estado==="Pendiente");return[p.nombre,p.dni,p.telefono,p.edad,p.fecha,p.estado,p.programa,p.categoria,p.riesgo,p.modalidad||"Presencial",(p.sessions||[]).length,(p.appointments||[]).length,pending.length,pending.reduce((s,x)=>s+Number(x.monto||0),0),p.motivo]});const csv=[h,...rows].map(r=>r.map(v=>`"${String(v??"").replaceAll('"','""')}"`).join(",")).join("\n");downloadFile(csv,"expedientes_"+todayISO()+".csv","text/csv;charset=utf-8")}
+    function downloadFile(content,filename,type){const blob=new Blob([content],{type});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(url),500)}
+    async function seedDemo(){if(patients.length&&!confirm("Se agregarán pacientes demo. ¿Continuar?"))return;const base=[{nombre:"María López",dni:"74581236",telefono:"987 654 321",edad:29,estado:"Activo",programa:"Ansiedad",categoria:"Terapia individual",riesgo:"Medio",modalidad:"Presencial",responsable:"",motivo:"Crisis de ansiedad y dificultades para dormir.",objetivo:"Regular síntomas y trabajar técnicas de respiración.",observaciones:"Paciente colaboradora y motivada.",proximaCita:todayISO(1),horaCita:"10:00",tarifa:80,pago:"Pendiente"},{nombre:"Carlos Ramírez",dni:"45879612",telefono:"965 123 456",edad:41,estado:"Activo",programa:"De pareja",categoria:"Terapia de pareja",riesgo:"Bajo",modalidad:"Virtual",responsable:"",motivo:"Conflictos de comunicación en la relación.",objetivo:"Mejorar comunicación y escucha activa.",observaciones:"Asiste con su pareja.",proximaCita:todayISO(3),horaCita:"17:30",tarifa:120,pago:"Pagado"},{nombre:"Ana Torres",dni:"70124589",telefono:"",edad:16,estado:"Activo",programa:"Adolescente",categoria:"Seguimiento",riesgo:"Alto",modalidad:"Presencial",responsable:"Madre: Rosa Torres",motivo:"Aislamiento social e irritabilidad.",objetivo:"Evaluación inicial y plan familiar.",observaciones:"Seguimiento cercano requerido.",proximaCita:todayISO(),horaCita:"15:00",tarifa:70,pago:"Pendiente"}].map(x=>normalizePatients([{...x,id:makeId(),fecha:todayISO(-Math.floor(Math.random()*40))}])[0]);base[0].notes.push({id:makeId(),fecha:todayISO(-2),titulo:"Evolución semana 4",tipo:"Nota interna",texto:"Menor intensidad de síntomas. Practicó técnicas de respiración diariamente."});patients=[...base,...patients];await saveNow();populateFilterPrograms();render();showToast("Pacientes demo cargados.")}
 
-      try {
-        const text = await file.text();
-        const json = JSON.parse(text);
-        const imported = Array.isArray(json) ? json : json.patients;
-
-        if (!Array.isArray(imported)) {
-          alert("El archivo no tiene un formato válido.");
-          return;
-        }
-
-        if (!confirm("¿Restaurar este respaldo? Se reemplazarán los datos actuales.")) return;
-
-        patients = imported;
-        await saveNow();
-        clearForm();
-        render();
-        alert("Respaldo restaurado correctamente.");
-      } catch (error) {
-        alert("No se pudo leer el respaldo JSON.");
-      }
-    }
-
-    function exportCSV() {
-      if (!patients.length) {
-        alert("No hay pacientes para exportar.");
-        return;
-      }
-
-      const headers = ["Nombre", "DNI", "Fecha", "Programa", "Categoria", "Motivo", "Observaciones"];
-      const rows = patients.map(p => [
-        p.nombre,
-        p.dni,
-        p.fecha,
-        p.programa,
-        p.categoria,
-        p.motivo,
-        p.observaciones || ""
-      ]);
-
-      const csv = [headers, ...rows]
-        .map(row => row.map(value => `"${String(value).replaceAll('"', '""')}"`).join(","))
-        .join("\n");
-
-      downloadFile(csv, "pacientes_psicologia_" + todayName() + ".csv", "text/csv;charset=utf-8;");
-    }
-
-    function downloadFile(content, filename, type) {
-      const blob = new Blob([content], { type });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = filename;
-      a.click();
-      setTimeout(() => URL.revokeObjectURL(url), 500);
-    }
-
-    function todayName() {
-      const d = new Date();
-      const y = d.getFullYear();
-      const m = String(d.getMonth() + 1).padStart(2, "0");
-      const day = String(d.getDate()).padStart(2, "0");
-      return `${y}-${m}-${day}`;
-    }
-
-    function formatDate(date) {
-      if (!date) return "";
-      const [y, m, d] = date.split("-");
-      return `${d}/${m}/${y}`;
-    }
-
-    function escapeHTML(value) {
-      return String(value || "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-    }
+    /* --- UTILS --- */
+    function makeId(){return window.crypto?.randomUUID?window.crypto.randomUUID():"id-"+Date.now()+"-"+Math.random().toString(16).slice(2)}
+    function todayISO(offset=0){const d=new Date();d.setDate(d.getDate()+offset);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`}
+    function formatDate(date){if(!date)return"";const [y,m,d]=String(date).split("-");return d&&m&&y?`${d}/${m}/${y}`:date}
+    function money(v){return "S/ "+Number(v||0).toLocaleString("es-PE",{minimumFractionDigits:0,maximumFractionDigits:2})}
+    function escapeHTML(v){return String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;")}
+    function showToast(msg){gid("toastMsg").textContent=msg;const t=gid("toast");t.classList.add("show");clearTimeout(window.__toast);window.__toast=setTimeout(()=>t.classList.remove("show"),2800)}
+    function nextAppointment(p){const today=todayISO();return(p.appointments||[]).filter(a=>a.fecha&&a.fecha>=today&&a.estado!=="Cancelada").sort((a,b)=>(a.fecha+(a.hora||"")).localeCompare(b.fecha+(b.hora||"")))[0]||null}
+    function latestPayment(p){return(p.payments||[]).slice().sort((a,b)=>(b.fecha||"").localeCompare(a.fecha||""))[0]||null}
+    function closeSidebar(){gid("sidebar").classList.remove("open");document.body.classList.remove("sidebar-open")}
+    function scrollToSection(id){gid(id)?.scrollIntoView({behavior:"smooth",block:"start"});closeSidebar()}
+    function toggleSidebar(){const s=gid("sidebar");s.classList.toggle("open");document.body.classList.toggle("sidebar-open",s.classList.contains("open"))}
+    window.addEventListener("resize",()=>{if(window.innerWidth>1100)closeSidebar()})
   </script>
 </body>
 </html>
